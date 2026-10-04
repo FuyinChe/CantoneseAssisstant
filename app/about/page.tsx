@@ -1,53 +1,76 @@
+import { siteName, siteNameEn } from "@/lib/site";
+
 export default function AboutPage() {
   return (
-    <article className="mx-auto flex w-full max-w-3xl flex-col gap-4 px-4 py-6 text-sm leading-7">
-      <h1 className="text-2xl font-semibold">关于</h1>
-      <p>
-        粤语助手是个人、非商业的学习工具。简体或繁体都可以输入：简体标拼音，并给出英文机器翻译；台湾繁体标注音，香港字形再换成粤语书面说法并标粤拼。朗读优先使用在线神经语音：普通话晓晓、台湾国语晓臻、粤语晓曼、英语 Aria。句子会送到在线语音服务；若暂时读不了，再改用这台设备自己的语音。英文翻译也会把简体句子发送到在线翻译服务。
-      </p>
-      <p>
-        粤典 words.hk 没有可供实时调用的查询接口。完整词典以《非商业开放资料授权协议 1.0》发布，必须署名，不能用于商业。把
-        <code className="mx-1">all.csv</code>
-        或
-        <code className="mx-1">all.csv.gz</code>
-        放到
-        <code className="mx-1">data/raw/</code>
-        后运行
-        <code className="mx-1">npm run lexicon</code>
-        ，脚本会抽出简体对照和短例句。若以后作商业用途，必须撤下粤典数据。
-      </p>
-      <p>
-        CC-Canto 以知识共享 署名-相同方式共享 3.0 发布。把
-        <code className="mx-1">cccanto.txt</code>
-        放进同一目录再运行脚本，可以补入词条。OpenCC 负责香港和台湾字形，to-jyutping（CanCLID，BSD-2-Clause）负责粤拼，pinyin-pro（zh-lx，MIT）负责拼音，注音由拼音转写。
-      </p>
-      <p>
-        影视、图书、新闻、博客和社交媒体没有整段收录。这些作品多半有版权。词汇页可以自己追加短句，并选择来源类型；追加内容只存在这台浏览器。
-      </p>
-      <p>
-        第一版的改写走词库。
-        <code className="mx-1">lib/rewrite/llm.ts</code>
-        留作以后的大模型改写，当前页面不会调用它。朗读默认走 Edge 在线语音；把
-        <code className="mx-1">TTS_PROVIDER</code>
-        设为 azure 并填上微软语音密钥后，会改用同一批神经声线。
-      </p>
-      <ul className="list-disc pl-5">
-        <li>
-          <a className="underline" href="https://words.hk/">粤典 words.hk</a>
-        </li>
-        <li>
-          <a className="underline" href="https://cccanto.org/">CC-Canto</a>
-        </li>
-        <li>
-          <a className="underline" href="https://github.com/BYVoid/OpenCC">OpenCC</a>
-        </li>
-        <li>
-          <a className="underline" href="https://github.com/CanCLID/to-jyutping">to-jyutping</a>
-        </li>
-        <li>
-          <a className="underline" href="https://github.com/zh-lx/pinyin-pro">pinyin-pro</a>
-        </li>
-      </ul>
+    <article className="mx-auto flex w-full max-w-3xl flex-col gap-8 px-4 py-6 text-sm leading-7">
+      <header className="flex flex-col gap-3">
+        <h1 className="text-2xl font-semibold">关于{siteName}</h1>
+        <p>
+          {siteName}（{siteNameEn}）是一个个人、非商业的粤语学习工具。输入一句中文，就能看到粤语说法、三种字形、读音和英文，也可以从图片识字，或把香港繁体做成笔顺工作纸。
+        </p>
+      </header>
+
+      <section className="flex flex-col gap-2">
+        <h2 className="text-base font-semibold">粤语书面说法</h2>
+        <p>
+          简体、繁体或两者夹杂都可以直接输入。句子会换成粤语书面说法，每个字下面标粤拼。点一个字可以听这个字的粤语；多音字点下面的粤拼，可以换成另一个读音。整句也可以按粤语习惯朗读。
+        </p>
+      </section>
+
+      <section className="flex flex-col gap-2">
+        <h2 className="text-base font-semibold">三种字形对照</h2>
+        <p>
+          同一句话并排显示香港繁体、台湾繁体和简体。同一位置用字不同的字会标出来。香港字形只改用字，口头说法留在粤语那一栏。台湾繁体标注音，简体标拼音，多音字同样可以改读音。整句可以分别按国语习惯和普通话习惯朗读。
+        </p>
+      </section>
+
+      <section className="flex flex-col gap-2">
+        <h2 className="text-base font-semibold">英文</h2>
+        <p>简体句子会译成英文，并可以按英语朗读。朗读和英文翻译都会把这句话送到在线服务。</p>
+      </section>
+
+      <section className="flex flex-col gap-2">
+        <h2 className="text-base font-semibold">从图片识字</h2>
+        <p>
+          可以拍照或从相册选一张图片，识别整张，或在图片上拖出一块再识别。认出的字会填进输入框，接着走同一套粤语转换。图片留在这台设备上，识别完成后可以收起，只留一条预览。
+        </p>
+      </section>
+
+      <section className="flex flex-col gap-2">
+        <h2 className="text-base font-semibold">笔顺工作纸</h2>
+        <p>
+          香港繁体可以打开笔顺工作纸。每个字按笔画展开，下面留田字格临写。可以勾选要打印的字，并在大方格和小方格之间切换，然后打印或另存为 PDF。
+        </p>
+      </section>
+
+      <section className="flex flex-col gap-2">
+        <h2 className="text-base font-semibold">日常粤语短句</h2>
+        <p>
+          短句按场景整理，包括招呼、天气、问路、食物、菜市场、购物、交通、学校、体育运动、亲属关系、打电话等。可以按场景筛选或搜索，点字听粤语。
+        </p>
+      </section>
+
+      <section className="flex flex-col gap-2">
+        <h2 className="text-base font-semibold">所用资料</h2>
+        <ul className="list-disc pl-5">
+          <li>
+            <a className="underline" href="https://github.com/BYVoid/OpenCC">OpenCC</a>
+            负责香港和台湾字形。
+          </li>
+          <li>
+            <a className="underline" href="https://github.com/CanCLID/to-jyutping">to-jyutping</a>
+            （CanCLID，BSD-2-Clause）负责粤拼。
+          </li>
+          <li>
+            <a className="underline" href="https://github.com/zh-lx/pinyin-pro">pinyin-pro</a>
+            （zh-lx，MIT）负责拼音，注音由拼音转写。
+          </li>
+          <li>
+            <a className="underline" href="https://github.com/skishore/makemeahanzi">Make Me a Hanzi</a>
+            提供笔顺笔画，供临写参考。
+          </li>
+        </ul>
+      </section>
     </article>
   );
 }

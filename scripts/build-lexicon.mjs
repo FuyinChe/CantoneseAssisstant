@@ -6,6 +6,7 @@ import { gunzipSync } from "node:zlib";
 import { fileURLToPath } from "node:url";
 import * as OpenCC from "opencc-js";
 import { getJyutpingText } from "to-jyutping";
+import { generatedDailySentences } from "./daily-sentences.mjs";
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const rawDir = path.join(root, "data", "raw");
@@ -114,6 +115,7 @@ function makeExample(partial) {
   const traditional = toHk(partial.simplified);
   return {
     id: partial.id,
+    category: partial.category,
     traditional,
     simplified: partial.simplified,
     cantonese: partial.cantonese,
@@ -246,6 +248,20 @@ async function main() {
       mandarinGloss: example.mandarinGloss || example.simplified,
     }),
   );
+  const seenExample = new Set(examples.map((example) => example.cantonese));
+  let generatedCount = 0;
+  for (const row of generatedDailySentences()) {
+    if (seenExample.has(row.cantonese)) continue;
+    seenExample.add(row.cantonese);
+    generatedCount += 1;
+    examples.push(
+      makeExample({
+        ...row,
+        id: `gen-${String(generatedCount).padStart(4, "0")}`,
+        mandarinGloss: row.mandarinGloss || row.simplified,
+      }),
+    );
+  }
 
   await importWordsHk(phrases, seen, examples);
   await importCcCanto(examples);

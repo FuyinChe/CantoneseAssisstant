@@ -1,188 +1,98 @@
 {
   "examples": [
     {
-      "id": "daily-01",
-      "cantonese": "我唔知点行。",
-      "simplified": "我不知道怎么走。",
-      "mandarinGloss": "我不知道怎么走。",
-      "sourceType": "user",
-      "sourceTitle": "本应用整理",
-      "license": "original",
-      "note": "问路。影视、新闻和社交媒体例句请在词汇页自行录入，并注明出处。"
-    },
-    {
-      "id": "daily-02",
-      "cantonese": "你食咗饭未？",
-      "simplified": "你吃饭了吗？",
-      "mandarinGloss": "你吃饭了吗？",
+      "id": "greeting-01",
+      "category": "greeting",
+      "cantonese": "早晨。",
+      "simplified": "早上好。",
+      "mandarinGloss": "早上好。",
       "sourceType": "user",
       "sourceTitle": "本应用整理",
       "license": "original"
     },
     {
-      "id": "daily-03",
-      "cantonese": "今日天气好好。",
-      "simplified": "今天天气很好。",
-      "mandarinGloss": "今天天气很好。",
+      "id": "greeting-02",
+      "category": "greeting",
+      "cantonese": "你好。",
+      "simplified": "你好。",
+      "mandarinGloss": "你好。",
       "sourceType": "user",
       "sourceTitle": "本应用整理",
       "license": "original"
     },
     {
-      "id": "daily-04",
-      "cantonese": "呢个系咩？",
-      "simplified": "这是什么？",
-      "mandarinGloss": "这是什么？",
+      "id": "greeting-03",
+      "category": "greeting",
+      "cantonese": "拜拜，听日见。",
+      "simplified": "拜拜，明天见。",
+      "mandarinGloss": "拜拜，明天见。",
       "sourceType": "user",
       "sourceTitle": "本应用整理",
       "license": "original"
     },
     {
-      "id": "daily-05",
-      "cantonese": "我而家冇时间。",
-      "simplified": "我现在没有时间。",
-      "mandarinGloss": "我现在没有时间。",
+      "id": "greeting-04",
+      "category": "greeting",
+      "cantonese": "好耐冇见。",
+      "simplified": "好久不见。",
+      "mandarinGloss": "好久不见。",
       "sourceType": "user",
       "sourceTitle": "本应用整理",
       "license": "original"
     },
     {
-      "id": "daily-06",
-      "cantonese": "佢哋听日先返嚟。",
-      "simplified": "他们明天才回来。",
-      "mandarinGloss": "他们明天才回来。",
+      "id": "greeting-05",
+      "category": "greeting",
+      "cantonese": "你最近点呀？",
+      "simplified": "你最近怎么样？",
+      "mandarinGloss": "你最近怎么样？",
       "sourceType": "user",
       "sourceTitle": "本应用整理",
       "license": "original"
     },
     {
-      "id": "daily-07",
-      "cantonese": "唔该畀我一杯水。",
-      "simplified": "请给我一杯水。",
-      "mandarinGloss": "请给我一杯水。",
+      "id": "greeting-06",
+      "category": "greeting",
+      "cantonese": "辛苦晒。",
+      "simplified": "辛苦了。",
+      "mandarinGloss": "辛苦了。",
       "sourceType": "user",
       "sourceTitle": "本应用整理",
       "license": "original"
     },
     {
-      "id": "daily-08",
-      "cantonese": "几多钱呀？",
-      "simplified": "多少钱？",
-      "mandarinGloss": "多少钱？",
+      "id": "greeting-07",
+      "category": "greeting",
+      "cantonese": "早唞啦。",
+      "simplified": "早点休息。",
+      "mandarinGloss": "早点休息。",
       "sourceType": "user",
       "sourceTitle": "本应用整理",
       "license": "original"
     },
     {
-      "id": "daily-09",
-      "cantonese": "我好钟意食面。",
-      "simplified": "我很喜欢吃面。",
-      "mandarinGloss": "我很喜欢吃面。",
+      "id": "greeting-08",
+      "category": "greeting",
+      "cantonese": "一路顺风。",
+      "simplified": "一路平安。",
+      "mandarinGloss": "一路平安。",
       "sourceType": "user",
       "sourceTitle": "本应用整理",
       "license": "original"
     },
     {
-      "id": "daily-10",
-      "cantonese": "而家落紧雨。",
-      "simplified": "现在正在下雨。",
-      "mandarinGloss": "现在正在下雨。",
+      "id": "greeting-09",
+      "category": "greeting",
+      "cantonese": "入嚟坐啦。",
+      "simplified": "进来坐吧。",
+      "mandarinGloss": "进来坐吧。",
       "sourceType": "user",
       "sourceTitle": "本应用整理",
       "license": "original"
     },
     {
-      "id": "daily-11",
-      "cantonese": "你住喺边度？",
-      "simplified": "你住在哪里？",
-      "mandarinGloss": "你住在哪里？",
-      "sourceType": "user",
-      "sourceTitle": "本应用整理",
-      "license": "original"
-    },
-    {
-      "id": "daily-12",
-      "cantonese": "我琴日先见到佢。",
-      "simplified": "我昨天才见到他。",
-      "mandarinGloss": "我昨天才见到他。",
-      "sourceType": "user",
-      "sourceTitle": "本应用整理",
-      "license": "original"
-    },
-    {
-      "id": "daily-13",
-      "cantonese": "唔使客气。",
-      "simplified": "不用客气。",
-      "mandarinGloss": "不用客气。",
-      "sourceType": "user",
-      "sourceTitle": "本应用整理",
-      "license": "original"
-    },
-    {
-      "id": "daily-14",
-      "cantonese": "我搞掂咗。",
-      "simplified": "我搞定了。",
-      "mandarinGloss": "我搞定了。",
-      "sourceType": "user",
-      "sourceTitle": "本应用整理",
-      "license": "original"
-    },
-    {
-      "id": "daily-15",
-      "cantonese": "等我一阵。",
-      "simplified": "等我一下。",
-      "mandarinGloss": "等我一下。",
-      "sourceType": "user",
-      "sourceTitle": "本应用整理",
-      "license": "original"
-    },
-    {
-      "id": "daily-16",
-      "cantonese": "你识唔识讲广东话？",
-      "simplified": "你会不会说粤语？",
-      "mandarinGloss": "你会不会说粤语？",
-      "sourceType": "user",
-      "sourceTitle": "本应用整理",
-      "license": "original"
-    },
-    {
-      "id": "daily-17",
-      "cantonese": "我听唔明，可唔可以讲慢啲？",
-      "simplified": "我听不懂，可不可以讲慢一点？",
-      "mandarinGloss": "我听不懂，可不可以讲慢一点？",
-      "sourceType": "user",
-      "sourceTitle": "本应用整理",
-      "license": "original"
-    },
-    {
-      "id": "daily-18",
-      "cantonese": "我哋一齐去睇戏啦。",
-      "simplified": "我们一起去看电影吧。",
-      "mandarinGloss": "我们一起去看电影吧。",
-      "sourceType": "user",
-      "sourceTitle": "本应用整理",
-      "license": "original"
-    },
-    {
-      "id": "daily-19",
-      "cantonese": "呢度好近，行路得啦。",
-      "simplified": "这里很近，走路就行。",
-      "mandarinGloss": "这里很近，走路就行。",
-      "sourceType": "user",
-      "sourceTitle": "本应用整理",
-      "license": "original"
-    },
-    {
-      "id": "daily-20",
-      "cantonese": "对唔住，我迟到咗。",
-      "simplified": "对不起，我迟到了。",
-      "mandarinGloss": "对不起，我迟到了。",
-      "sourceType": "user",
-      "sourceTitle": "本应用整理",
-      "license": "original"
-    },
-    {
-      "id": "daily-21",
+      "id": "greeting-10",
+      "category": "greeting",
       "cantonese": "你叫咩名？",
       "simplified": "你叫什么名字？",
       "mandarinGloss": "你叫什么名字？",
@@ -191,7 +101,238 @@
       "license": "original"
     },
     {
-      "id": "daily-22",
+      "id": "greeting-11",
+      "category": "greeting",
+      "cantonese": "你住喺边度？",
+      "simplified": "你住在哪里？",
+      "mandarinGloss": "你住在哪里？",
+      "sourceType": "user",
+      "sourceTitle": "本应用整理",
+      "license": "original"
+    },
+    {
+      "id": "weather-01",
+      "category": "weather",
+      "cantonese": "今日天气好好。",
+      "simplified": "今天天气很好。",
+      "mandarinGloss": "今天天气很好。",
+      "sourceType": "user",
+      "sourceTitle": "本应用整理",
+      "license": "original"
+    },
+    {
+      "id": "weather-02",
+      "category": "weather",
+      "cantonese": "而家落紧雨。",
+      "simplified": "现在正在下雨。",
+      "mandarinGloss": "现在正在下雨。",
+      "sourceType": "user",
+      "sourceTitle": "本应用整理",
+      "license": "original"
+    },
+    {
+      "id": "weather-03",
+      "category": "weather",
+      "cantonese": "今日好热。",
+      "simplified": "今天很热。",
+      "mandarinGloss": "今天很热。",
+      "sourceType": "user",
+      "sourceTitle": "本应用整理",
+      "license": "original"
+    },
+    {
+      "id": "weather-04",
+      "category": "weather",
+      "cantonese": "今日好冻。",
+      "simplified": "今天很冷。",
+      "mandarinGloss": "今天很冷。",
+      "sourceType": "user",
+      "sourceTitle": "本应用整理",
+      "license": "original"
+    },
+    {
+      "id": "weather-05",
+      "category": "weather",
+      "cantonese": "出面好大风。",
+      "simplified": "外面风很大。",
+      "mandarinGloss": "外面风很大。",
+      "sourceType": "user",
+      "sourceTitle": "本应用整理",
+      "license": "original"
+    },
+    {
+      "id": "weather-06",
+      "category": "weather",
+      "cantonese": "记得带遮。",
+      "simplified": "记得带伞。",
+      "mandarinGloss": "记得带伞。",
+      "sourceType": "user",
+      "sourceTitle": "本应用整理",
+      "license": "original"
+    },
+    {
+      "id": "weather-07",
+      "category": "weather",
+      "cantonese": "今日几多度？",
+      "simplified": "今天多少度？",
+      "mandarinGloss": "今天多少度？",
+      "sourceType": "user",
+      "sourceTitle": "本应用整理",
+      "license": "original"
+    },
+    {
+      "id": "weather-08",
+      "category": "weather",
+      "cantonese": "阵间可能落雨。",
+      "simplified": "一会儿可能下雨。",
+      "mandarinGloss": "一会儿可能下雨。",
+      "sourceType": "user",
+      "sourceTitle": "本应用整理",
+      "license": "original"
+    },
+    {
+      "id": "weather-09",
+      "category": "weather",
+      "cantonese": "打风，最好留喺屋企。",
+      "simplified": "刮台风，最好留在家里。",
+      "mandarinGloss": "刮台风，最好留在家里。",
+      "sourceType": "user",
+      "sourceTitle": "本应用整理",
+      "license": "original"
+    },
+    {
+      "id": "weather-10",
+      "category": "weather",
+      "cantonese": "出太阳啦。",
+      "simplified": "出太阳了。",
+      "mandarinGloss": "出太阳了。",
+      "sourceType": "user",
+      "sourceTitle": "本应用整理",
+      "license": "original"
+    },
+    {
+      "id": "directions-01",
+      "category": "directions",
+      "cantonese": "我唔知点行。",
+      "simplified": "我不知道怎么走。",
+      "mandarinGloss": "我不知道怎么走。",
+      "sourceType": "user",
+      "sourceTitle": "本应用整理",
+      "license": "original"
+    },
+    {
+      "id": "directions-02",
+      "category": "directions",
+      "cantonese": "唔该，厕所喺边度？",
+      "simplified": "请问，厕所在哪里？",
+      "mandarinGloss": "请问，厕所在哪里？",
+      "sourceType": "user",
+      "sourceTitle": "本应用整理",
+      "license": "original"
+    },
+    {
+      "id": "directions-03",
+      "category": "directions",
+      "cantonese": "点去地铁站？",
+      "simplified": "怎么去地铁站？",
+      "mandarinGloss": "怎么去地铁站？",
+      "sourceType": "user",
+      "sourceTitle": "本应用整理",
+      "license": "original"
+    },
+    {
+      "id": "directions-04",
+      "category": "directions",
+      "cantonese": "行过去远唔远？",
+      "simplified": "走过去远不远？",
+      "mandarinGloss": "走过去远不远？",
+      "sourceType": "user",
+      "sourceTitle": "本应用整理",
+      "license": "original"
+    },
+    {
+      "id": "directions-05",
+      "category": "directions",
+      "cantonese": "向左转就到。",
+      "simplified": "向左转就到了。",
+      "mandarinGloss": "向左转就到了。",
+      "sourceType": "user",
+      "sourceTitle": "本应用整理",
+      "license": "original"
+    },
+    {
+      "id": "directions-06",
+      "category": "directions",
+      "cantonese": "一直行，唔使转。",
+      "simplified": "一直走，不用拐弯。",
+      "mandarinGloss": "一直走，不用拐弯。",
+      "sourceType": "user",
+      "sourceTitle": "本应用整理",
+      "license": "original"
+    },
+    {
+      "id": "directions-07",
+      "category": "directions",
+      "cantonese": "过对面马路。",
+      "simplified": "过对面马路。",
+      "mandarinGloss": "过对面马路。",
+      "sourceType": "user",
+      "sourceTitle": "本应用整理",
+      "license": "original"
+    },
+    {
+      "id": "directions-08",
+      "category": "directions",
+      "cantonese": "我迷路咗。",
+      "simplified": "我迷路了。",
+      "mandarinGloss": "我迷路了。",
+      "sourceType": "user",
+      "sourceTitle": "本应用整理",
+      "license": "original"
+    },
+    {
+      "id": "directions-09",
+      "category": "directions",
+      "cantonese": "呢度好近，行路得啦。",
+      "simplified": "这里很近，走路就行。",
+      "mandarinGloss": "这里很近，走路就行。",
+      "sourceType": "user",
+      "sourceTitle": "本应用整理",
+      "license": "original"
+    },
+    {
+      "id": "directions-10",
+      "category": "directions",
+      "cantonese": "呢班车去唔去中环？",
+      "simplified": "这班车去不去中环？",
+      "mandarinGloss": "这班车去不去中环？",
+      "sourceType": "user",
+      "sourceTitle": "本应用整理",
+      "license": "original"
+    },
+    {
+      "id": "food-01",
+      "category": "food",
+      "cantonese": "你食咗饭未？",
+      "simplified": "你吃饭了吗？",
+      "mandarinGloss": "你吃饭了吗？",
+      "sourceType": "user",
+      "sourceTitle": "本应用整理",
+      "license": "original"
+    },
+    {
+      "id": "food-02",
+      "category": "food",
+      "cantonese": "我好钟意食面。",
+      "simplified": "我很喜欢吃面。",
+      "mandarinGloss": "我很喜欢吃面。",
+      "sourceType": "user",
+      "sourceTitle": "本应用整理",
+      "license": "original"
+    },
+    {
+      "id": "food-03",
+      "category": "food",
       "cantonese": "我仲未食早餐。",
       "simplified": "我还没吃早餐。",
       "mandarinGloss": "我还没吃早餐。",
@@ -200,7 +341,398 @@
       "license": "original"
     },
     {
-      "id": "daily-23",
+      "id": "food-04",
+      "category": "food",
+      "cantonese": "唔该畀我一杯水。",
+      "simplified": "请给我一杯水。",
+      "mandarinGloss": "请给我一杯水。",
+      "sourceType": "user",
+      "sourceTitle": "本应用整理",
+      "license": "original"
+    },
+    {
+      "id": "food-05",
+      "category": "food",
+      "cantonese": "我唔食辣。",
+      "simplified": "我不吃辣。",
+      "mandarinGloss": "我不吃辣。",
+      "sourceType": "user",
+      "sourceTitle": "本应用整理",
+      "license": "original"
+    },
+    {
+      "id": "food-06",
+      "category": "food",
+      "cantonese": "埋单，唔该。",
+      "simplified": "买单，谢谢。",
+      "mandarinGloss": "买单，谢谢。",
+      "sourceType": "user",
+      "sourceTitle": "本应用整理",
+      "license": "original"
+    },
+    {
+      "id": "food-07",
+      "category": "food",
+      "cantonese": "呢个好好味。",
+      "simplified": "这个很好吃。",
+      "mandarinGloss": "这个很好吃。",
+      "sourceType": "user",
+      "sourceTitle": "本应用整理",
+      "license": "original"
+    },
+    {
+      "id": "food-08",
+      "category": "food",
+      "cantonese": "我饱啦。",
+      "simplified": "我饱了。",
+      "mandarinGloss": "我饱了。",
+      "sourceType": "user",
+      "sourceTitle": "本应用整理",
+      "license": "original"
+    },
+    {
+      "id": "food-09",
+      "category": "food",
+      "cantonese": "要一杯冻柠茶，少甜。",
+      "simplified": "要一杯冻柠檬茶，少糖。",
+      "mandarinGloss": "要一杯冻柠檬茶，少糖。",
+      "sourceType": "user",
+      "sourceTitle": "本应用整理",
+      "license": "original"
+    },
+    {
+      "id": "food-10",
+      "category": "food",
+      "cantonese": "打包，唔该。",
+      "simplified": "打包，谢谢。",
+      "mandarinGloss": "打包，谢谢。",
+      "sourceType": "user",
+      "sourceTitle": "本应用整理",
+      "license": "original"
+    },
+    {
+      "id": "food-11",
+      "category": "food",
+      "cantonese": "等位要几耐？",
+      "simplified": "等位要多久？",
+      "mandarinGloss": "等位要多久？",
+      "sourceType": "user",
+      "sourceTitle": "本应用整理",
+      "license": "original"
+    },
+    {
+      "id": "food-12",
+      "category": "food",
+      "cantonese": "我请你食饭。",
+      "simplified": "我请你吃饭。",
+      "mandarinGloss": "我请你吃饭。",
+      "sourceType": "user",
+      "sourceTitle": "本应用整理",
+      "license": "original"
+    },
+    {
+      "id": "food-13",
+      "category": "food",
+      "cantonese": "有冇素菜？",
+      "simplified": "有素菜吗？",
+      "mandarinGloss": "有素菜吗？",
+      "sourceType": "user",
+      "sourceTitle": "本应用整理",
+      "license": "original"
+    },
+    {
+      "id": "shopping-01",
+      "category": "shopping",
+      "cantonese": "几多钱呀？",
+      "simplified": "多少钱？",
+      "mandarinGloss": "多少钱？",
+      "sourceType": "user",
+      "sourceTitle": "本应用整理",
+      "license": "original"
+    },
+    {
+      "id": "shopping-02",
+      "category": "shopping",
+      "cantonese": "平啲得唔得？",
+      "simplified": "便宜一点行不行？",
+      "mandarinGloss": "便宜一点行不行？",
+      "sourceType": "user",
+      "sourceTitle": "本应用整理",
+      "license": "original"
+    },
+    {
+      "id": "shopping-03",
+      "category": "shopping",
+      "cantonese": "我睇睇先。",
+      "simplified": "我先看看。",
+      "mandarinGloss": "我先看看。",
+      "sourceType": "user",
+      "sourceTitle": "本应用整理",
+      "license": "original"
+    },
+    {
+      "id": "shopping-04",
+      "category": "shopping",
+      "cantonese": "有冇大一个码？",
+      "simplified": "有没有大一号？",
+      "mandarinGloss": "有没有大一号？",
+      "sourceType": "user",
+      "sourceTitle": "本应用整理",
+      "license": "original"
+    },
+    {
+      "id": "shopping-05",
+      "category": "shopping",
+      "cantonese": "我要呢个。",
+      "simplified": "我要这个。",
+      "mandarinGloss": "我要这个。",
+      "sourceType": "user",
+      "sourceTitle": "本应用整理",
+      "license": "original"
+    },
+    {
+      "id": "shopping-06",
+      "category": "shopping",
+      "cantonese": "可唔可以拍卡？",
+      "simplified": "可以刷卡吗？",
+      "mandarinGloss": "可以刷卡吗？",
+      "sourceType": "user",
+      "sourceTitle": "本应用整理",
+      "license": "original"
+    },
+    {
+      "id": "shopping-07",
+      "category": "shopping",
+      "cantonese": "有冇收据？",
+      "simplified": "有没有收据？",
+      "mandarinGloss": "有没有收据？",
+      "sourceType": "user",
+      "sourceTitle": "本应用整理",
+      "license": "original"
+    },
+    {
+      "id": "shopping-08",
+      "category": "shopping",
+      "cantonese": "我净系睇下。",
+      "simplified": "我只是看看。",
+      "mandarinGloss": "我只是看看。",
+      "sourceType": "user",
+      "sourceTitle": "本应用整理",
+      "license": "original"
+    },
+    {
+      "id": "shopping-09",
+      "category": "shopping",
+      "cantonese": "唔该找钱。",
+      "simplified": "请找零。",
+      "mandarinGloss": "请找零。",
+      "sourceType": "user",
+      "sourceTitle": "本应用整理",
+      "license": "original"
+    },
+    {
+      "id": "shopping-10",
+      "category": "shopping",
+      "cantonese": "呢件几折？",
+      "simplified": "这件打几折？",
+      "mandarinGloss": "这件打几折？",
+      "sourceType": "user",
+      "sourceTitle": "本应用整理",
+      "license": "original"
+    },
+    {
+      "id": "transport-01",
+      "category": "transport",
+      "cantonese": "下一班车几时到？",
+      "simplified": "下一班车什么时候到？",
+      "mandarinGloss": "下一班车什么时候到？",
+      "sourceType": "user",
+      "sourceTitle": "本应用整理",
+      "license": "original"
+    },
+    {
+      "id": "transport-02",
+      "category": "transport",
+      "cantonese": "我赶时间。",
+      "simplified": "我赶时间。",
+      "mandarinGloss": "我赶时间。",
+      "sourceType": "user",
+      "sourceTitle": "本应用整理",
+      "license": "original"
+    },
+    {
+      "id": "transport-03",
+      "category": "transport",
+      "cantonese": "唔该，呢度落车。",
+      "simplified": "请在这里下车。",
+      "mandarinGloss": "请在这里下车。",
+      "sourceType": "user",
+      "sourceTitle": "本应用整理",
+      "license": "original"
+    },
+    {
+      "id": "transport-04",
+      "category": "transport",
+      "cantonese": "去机场大概要几耐？",
+      "simplified": "去机场大概要多久？",
+      "mandarinGloss": "去机场大概要多久？",
+      "sourceType": "user",
+      "sourceTitle": "本应用整理",
+      "license": "original"
+    },
+    {
+      "id": "transport-05",
+      "category": "transport",
+      "cantonese": "呢度塞车。",
+      "simplified": "这里堵车。",
+      "mandarinGloss": "这里堵车。",
+      "sourceType": "user",
+      "sourceTitle": "本应用整理",
+      "license": "original"
+    },
+    {
+      "id": "transport-06",
+      "category": "transport",
+      "cantonese": "我搭错车。",
+      "simplified": "我坐错车了。",
+      "mandarinGloss": "我坐错车了。",
+      "sourceType": "user",
+      "sourceTitle": "本应用整理",
+      "license": "original"
+    },
+    {
+      "id": "transport-07",
+      "category": "transport",
+      "cantonese": "呢班车可唔可以拍卡？",
+      "simplified": "这班车可以刷卡吗？",
+      "mandarinGloss": "这班车可以刷卡吗？",
+      "sourceType": "user",
+      "sourceTitle": "本应用整理",
+      "license": "original"
+    },
+    {
+      "id": "transport-08",
+      "category": "transport",
+      "cantonese": "我要去尖沙咀。",
+      "simplified": "我要去尖沙咀。",
+      "mandarinGloss": "我要去尖沙咀。",
+      "sourceType": "user",
+      "sourceTitle": "本应用整理",
+      "license": "original"
+    },
+    {
+      "id": "transport-09",
+      "category": "transport",
+      "cantonese": "驶慢啲，唔该。",
+      "simplified": "开慢一点，谢谢。",
+      "mandarinGloss": "开慢一点，谢谢。",
+      "sourceType": "user",
+      "sourceTitle": "本应用整理",
+      "license": "original"
+    },
+    {
+      "id": "transport-10",
+      "category": "transport",
+      "cantonese": "唔该开门。",
+      "simplified": "请开门。",
+      "mandarinGloss": "请开门。",
+      "sourceType": "user",
+      "sourceTitle": "本应用整理",
+      "license": "original"
+    },
+    {
+      "id": "time-01",
+      "category": "time",
+      "cantonese": "而家几点？",
+      "simplified": "现在几点？",
+      "mandarinGloss": "现在几点？",
+      "sourceType": "user",
+      "sourceTitle": "本应用整理",
+      "license": "original"
+    },
+    {
+      "id": "time-02",
+      "category": "time",
+      "cantonese": "我而家冇时间。",
+      "simplified": "我现在没有时间。",
+      "mandarinGloss": "我现在没有时间。",
+      "sourceType": "user",
+      "sourceTitle": "本应用整理",
+      "license": "original"
+    },
+    {
+      "id": "time-03",
+      "category": "time",
+      "cantonese": "等我一阵。",
+      "simplified": "等我一下。",
+      "mandarinGloss": "等我一下。",
+      "sourceType": "user",
+      "sourceTitle": "本应用整理",
+      "license": "original"
+    },
+    {
+      "id": "time-04",
+      "category": "time",
+      "cantonese": "对唔住，我迟到咗。",
+      "simplified": "对不起，我迟到了。",
+      "mandarinGloss": "对不起，我迟到了。",
+      "sourceType": "user",
+      "sourceTitle": "本应用整理",
+      "license": "original"
+    },
+    {
+      "id": "time-05",
+      "category": "time",
+      "cantonese": "我琴日先见到佢。",
+      "simplified": "我昨天才见到他。",
+      "mandarinGloss": "我昨天才见到他。",
+      "sourceType": "user",
+      "sourceTitle": "本应用整理",
+      "license": "original"
+    },
+    {
+      "id": "time-06",
+      "category": "time",
+      "cantonese": "佢哋听日先返嚟。",
+      "simplified": "他们明天才回来。",
+      "mandarinGloss": "他们明天才回来。",
+      "sourceType": "user",
+      "sourceTitle": "本应用整理",
+      "license": "original"
+    },
+    {
+      "id": "time-07",
+      "category": "time",
+      "cantonese": "下个礼拜见。",
+      "simplified": "下个星期见。",
+      "mandarinGloss": "下个星期见。",
+      "sourceType": "user",
+      "sourceTitle": "本应用整理",
+      "license": "original"
+    },
+    {
+      "id": "time-08",
+      "category": "time",
+      "cantonese": "而家太早。",
+      "simplified": "现在太早了。",
+      "mandarinGloss": "现在太早了。",
+      "sourceType": "user",
+      "sourceTitle": "本应用整理",
+      "license": "original"
+    },
+    {
+      "id": "time-09",
+      "category": "time",
+      "cantonese": "你几时得闲？",
+      "simplified": "你什么时候有空？",
+      "mandarinGloss": "你什么时候有空？",
+      "sourceType": "user",
+      "sourceTitle": "本应用整理",
+      "license": "original"
+    },
+    {
+      "id": "home-01",
+      "category": "home",
       "cantonese": "快啲返屋企啦。",
       "simplified": "快点回家吧。",
       "mandarinGloss": "快点回家吧。",
@@ -209,10 +741,781 @@
       "license": "original"
     },
     {
-      "id": "daily-24",
+      "id": "home-02",
+      "category": "home",
+      "cantonese": "我返到屋企啦。",
+      "simplified": "我回到家了。",
+      "mandarinGloss": "我回到家了。",
+      "sourceType": "user",
+      "sourceTitle": "本应用整理",
+      "license": "original"
+    },
+    {
+      "id": "home-03",
+      "category": "home",
+      "cantonese": "门锁住咗。",
+      "simplified": "门锁上了。",
+      "mandarinGloss": "门锁上了。",
+      "sourceType": "user",
+      "sourceTitle": "本应用整理",
+      "license": "original"
+    },
+    {
+      "id": "home-04",
+      "category": "home",
+      "cantonese": "开冷气啦。",
+      "simplified": "开空调吧。",
+      "mandarinGloss": "开空调吧。",
+      "sourceType": "user",
+      "sourceTitle": "本应用整理",
+      "license": "original"
+    },
+    {
+      "id": "home-05",
+      "category": "home",
+      "cantonese": "记得收衫。",
+      "simplified": "记得收衣服。",
+      "mandarinGloss": "记得收衣服。",
+      "sourceType": "user",
+      "sourceTitle": "本应用整理",
+      "license": "original"
+    },
+    {
+      "id": "home-06",
+      "category": "home",
+      "cantonese": "我去冲凉先。",
+      "simplified": "我先去洗澡。",
+      "mandarinGloss": "我先去洗澡。",
+      "sourceType": "user",
+      "sourceTitle": "本应用整理",
+      "license": "original"
+    },
+    {
+      "id": "home-07",
+      "category": "home",
+      "cantonese": "熄灯瞓觉啦。",
+      "simplified": "关灯睡觉吧。",
+      "mandarinGloss": "关灯睡觉吧。",
+      "sourceType": "user",
+      "sourceTitle": "本应用整理",
+      "license": "original"
+    },
+    {
+      "id": "home-08",
+      "category": "home",
+      "cantonese": "无线网络密码系咩？",
+      "simplified": "无线网密码是什么？",
+      "mandarinGloss": "无线网密码是什么？",
+      "sourceType": "user",
+      "sourceTitle": "本应用整理",
+      "license": "original"
+    },
+    {
+      "id": "family-01",
+      "category": "family",
+      "cantonese": "阿妈叫我返去食饭。",
+      "simplified": "妈妈叫我回去吃饭。",
+      "mandarinGloss": "妈妈叫我回去吃饭。",
+      "sourceType": "user",
+      "sourceTitle": "本应用整理",
+      "license": "original"
+    },
+    {
+      "id": "family-02",
+      "category": "family",
+      "cantonese": "你有几多兄弟姊妹？",
+      "simplified": "你有几个兄弟姐妹？",
+      "mandarinGloss": "你有几个兄弟姐妹？",
+      "sourceType": "user",
+      "sourceTitle": "本应用整理",
+      "license": "original"
+    },
+    {
+      "id": "family-03",
+      "category": "family",
+      "cantonese": "帮我睇住小朋友一阵。",
+      "simplified": "帮我看一会儿孩子。",
+      "mandarinGloss": "帮我看一会儿孩子。",
+      "sourceType": "user",
+      "sourceTitle": "本应用整理",
+      "license": "original"
+    },
+    {
+      "id": "family-04",
+      "category": "family",
+      "cantonese": "我哋一家四口。",
+      "simplified": "我们一家四口。",
+      "mandarinGloss": "我们一家四口。",
+      "sourceType": "user",
+      "sourceTitle": "本应用整理",
+      "license": "original"
+    },
+    {
+      "id": "family-05",
+      "category": "family",
+      "cantonese": "爷爷今日身体点呀？",
+      "simplified": "爷爷今天身体怎么样？",
+      "mandarinGloss": "爷爷今天身体怎么样？",
+      "sourceType": "user",
+      "sourceTitle": "本应用整理",
+      "license": "original"
+    },
+    {
+      "id": "family-06",
+      "category": "family",
+      "cantonese": "我要去接小朋友放学。",
+      "simplified": "我要去接孩子放学。",
+      "mandarinGloss": "我要去接孩子放学。",
+      "sourceType": "user",
+      "sourceTitle": "本应用整理",
+      "license": "original"
+    },
+    {
+      "id": "family-07",
+      "category": "family",
+      "cantonese": "我同屋企人一齐食饭。",
+      "simplified": "我和家人一起吃饭。",
+      "mandarinGloss": "我和家人一起吃饭。",
+      "sourceType": "user",
+      "sourceTitle": "本应用整理",
+      "license": "original"
+    },
+    {
+      "id": "work-01",
+      "category": "work",
+      "cantonese": "我返紧工。",
+      "simplified": "我正在上班。",
+      "mandarinGloss": "我正在上班。",
+      "sourceType": "user",
+      "sourceTitle": "本应用整理",
+      "license": "original"
+    },
+    {
+      "id": "work-02",
+      "category": "work",
+      "cantonese": "今日忙到颠。",
+      "simplified": "今天忙得不可开交。",
+      "mandarinGloss": "今天忙得不可开交。",
+      "sourceType": "user",
+      "sourceTitle": "本应用整理",
+      "license": "original"
+    },
+    {
+      "id": "work-03",
+      "category": "work",
+      "cantonese": "我开紧会，阵间再覆你。",
+      "simplified": "我正在开会，一会儿再回你。",
+      "mandarinGloss": "我正在开会，一会儿再回你。",
+      "sourceType": "user",
+      "sourceTitle": "本应用整理",
+      "license": "original"
+    },
+    {
+      "id": "work-04",
+      "category": "work",
+      "cantonese": "我放紧假。",
+      "simplified": "我正在放假。",
+      "mandarinGloss": "我正在放假。",
+      "sourceType": "user",
+      "sourceTitle": "本应用整理",
+      "license": "original"
+    },
+    {
+      "id": "work-05",
+      "category": "work",
+      "cantonese": "听日要交。",
+      "simplified": "明天要交。",
+      "mandarinGloss": "明天要交。",
+      "sourceType": "user",
+      "sourceTitle": "本应用整理",
+      "license": "original"
+    },
+    {
+      "id": "work-06",
+      "category": "work",
+      "cantonese": "可唔可以帮下手？",
+      "simplified": "能不能帮个忙？",
+      "mandarinGloss": "能不能帮个忙？",
+      "sourceType": "user",
+      "sourceTitle": "本应用整理",
+      "license": "original"
+    },
+    {
+      "id": "work-07",
+      "category": "work",
+      "cantonese": "今晚要加班。",
+      "simplified": "今晚要加班。",
+      "mandarinGloss": "今晚要加班。",
+      "sourceType": "user",
+      "sourceTitle": "本应用整理",
+      "license": "original"
+    },
+    {
+      "id": "work-08",
+      "category": "work",
+      "cantonese": "放工一齐走？",
+      "simplified": "下班一起走吗？",
+      "mandarinGloss": "下班一起走吗？",
+      "sourceType": "user",
+      "sourceTitle": "本应用整理",
+      "license": "original"
+    },
+    {
+      "id": "work-09",
+      "category": "work",
+      "cantonese": "我搞掂咗。",
+      "simplified": "我搞定了。",
+      "mandarinGloss": "我搞定了。",
+      "sourceType": "user",
+      "sourceTitle": "本应用整理",
+      "license": "original"
+    },
+    {
+      "id": "study-01",
+      "category": "study",
+      "cantonese": "你识唔识讲广东话？",
+      "simplified": "你会不会说粤语？",
+      "mandarinGloss": "你会不会说粤语？",
+      "sourceType": "user",
+      "sourceTitle": "本应用整理",
+      "license": "original"
+    },
+    {
+      "id": "study-02",
+      "category": "study",
+      "cantonese": "我听唔明，可唔可以讲慢啲？",
+      "simplified": "我听不懂，可不可以讲慢一点？",
+      "mandarinGloss": "我听不懂，可不可以讲慢一点？",
+      "sourceType": "user",
+      "sourceTitle": "本应用整理",
+      "license": "original"
+    },
+    {
+      "id": "study-03",
+      "category": "study",
+      "cantonese": "呢个字点读？",
+      "simplified": "这个字怎么读？",
+      "mandarinGloss": "这个字怎么读？",
+      "sourceType": "user",
+      "sourceTitle": "本应用整理",
+      "license": "original"
+    },
+    {
+      "id": "study-04",
+      "category": "study",
+      "cantonese": "可唔可以再讲一次？",
+      "simplified": "可以再说一次吗？",
+      "mandarinGloss": "可以再说一次吗？",
+      "sourceType": "user",
+      "sourceTitle": "本应用整理",
+      "license": "original"
+    },
+    {
+      "id": "study-05",
+      "category": "study",
+      "cantonese": "我写错咗。",
+      "simplified": "我写错了。",
+      "mandarinGloss": "我写错了。",
+      "sourceType": "user",
+      "sourceTitle": "本应用整理",
+      "license": "original"
+    },
+    {
+      "id": "study-06",
+      "category": "study",
+      "cantonese": "今日有好多功课。",
+      "simplified": "今天有很多作业。",
+      "mandarinGloss": "今天有很多作业。",
+      "sourceType": "user",
+      "sourceTitle": "本应用整理",
+      "license": "original"
+    },
+    {
+      "id": "study-07",
+      "category": "study",
+      "cantonese": "我温紧书。",
+      "simplified": "我正在复习。",
+      "mandarinGloss": "我正在复习。",
+      "sourceType": "user",
+      "sourceTitle": "本应用整理",
+      "license": "original"
+    },
+    {
+      "id": "study-08",
+      "category": "study",
+      "cantonese": "你教我讲呢句。",
+      "simplified": "你教我说这句。",
+      "mandarinGloss": "你教我说这句。",
+      "sourceType": "user",
+      "sourceTitle": "本应用整理",
+      "license": "original"
+    },
+    {
+      "id": "study-09",
+      "category": "study",
+      "cantonese": "可唔可以讲大声啲？",
+      "simplified": "可以大声一点吗？",
+      "mandarinGloss": "可以大声一点吗？",
+      "sourceType": "user",
+      "sourceTitle": "本应用整理",
+      "license": "original"
+    },
+    {
+      "id": "health-01",
+      "category": "health",
+      "cantonese": "我唔舒服。",
+      "simplified": "我不舒服。",
+      "mandarinGloss": "我不舒服。",
+      "sourceType": "user",
+      "sourceTitle": "本应用整理",
+      "license": "original"
+    },
+    {
+      "id": "health-02",
+      "category": "health",
+      "cantonese": "我头痛。",
+      "simplified": "我头疼。",
+      "mandarinGloss": "我头疼。",
+      "sourceType": "user",
+      "sourceTitle": "本应用整理",
+      "license": "original"
+    },
+    {
+      "id": "health-03",
+      "category": "health",
+      "cantonese": "我要睇医生。",
+      "simplified": "我要看医生。",
+      "mandarinGloss": "我要看医生。",
+      "sourceType": "user",
+      "sourceTitle": "本应用整理",
+      "license": "original"
+    },
+    {
+      "id": "health-04",
+      "category": "health",
+      "cantonese": "附近有冇药房？",
+      "simplified": "附近有药店吗？",
+      "mandarinGloss": "附近有药店吗？",
+      "sourceType": "user",
+      "sourceTitle": "本应用整理",
+      "license": "original"
+    },
+    {
+      "id": "health-05",
+      "category": "health",
+      "cantonese": "我对花生过敏。",
+      "simplified": "我对花生过敏。",
+      "mandarinGloss": "我对花生过敏。",
+      "sourceType": "user",
+      "sourceTitle": "本应用整理",
+      "license": "original"
+    },
+    {
+      "id": "health-06",
+      "category": "health",
+      "cantonese": "我感冒咗。",
+      "simplified": "我感冒了。",
+      "mandarinGloss": "我感冒了。",
+      "sourceType": "user",
+      "sourceTitle": "本应用整理",
+      "license": "original"
+    },
+    {
+      "id": "health-07",
+      "category": "health",
+      "cantonese": "休息多阵就得。",
+      "simplified": "休息一会儿就好。",
+      "mandarinGloss": "休息一会儿就好。",
+      "sourceType": "user",
+      "sourceTitle": "本应用整理",
+      "license": "original"
+    },
+    {
+      "id": "health-08",
+      "category": "health",
+      "cantonese": "快啲叫救护车。",
+      "simplified": "快点叫救护车。",
+      "mandarinGloss": "快点叫救护车。",
+      "sourceType": "user",
+      "sourceTitle": "本应用整理",
+      "license": "original"
+    },
+    {
+      "id": "feeling-01",
+      "category": "feeling",
+      "cantonese": "我好开心。",
+      "simplified": "我很开心。",
+      "mandarinGloss": "我很开心。",
+      "sourceType": "user",
+      "sourceTitle": "本应用整理",
+      "license": "original"
+    },
+    {
+      "id": "feeling-02",
+      "category": "feeling",
+      "cantonese": "我有啲担心。",
+      "simplified": "我有点担心。",
+      "mandarinGloss": "我有点担心。",
+      "sourceType": "user",
+      "sourceTitle": "本应用整理",
+      "license": "original"
+    },
+    {
+      "id": "feeling-03",
+      "category": "feeling",
+      "cantonese": "唔使惊。",
+      "simplified": "不用怕。",
+      "mandarinGloss": "不用怕。",
+      "sourceType": "user",
+      "sourceTitle": "本应用整理",
+      "license": "original"
+    },
+    {
+      "id": "feeling-04",
+      "category": "feeling",
+      "cantonese": "我好攰。",
+      "simplified": "我很累。",
+      "mandarinGloss": "我很累。",
+      "sourceType": "user",
+      "sourceTitle": "本应用整理",
+      "license": "original"
+    },
+    {
+      "id": "feeling-05",
+      "category": "feeling",
+      "cantonese": "慢慢嚟，唔使急。",
+      "simplified": "慢慢来，不用急。",
+      "mandarinGloss": "慢慢来，不用急。",
+      "sourceType": "user",
+      "sourceTitle": "本应用整理",
+      "license": "original"
+    },
+    {
+      "id": "feeling-06",
+      "category": "feeling",
+      "cantonese": "恭喜你。",
+      "simplified": "恭喜你。",
+      "mandarinGloss": "恭喜你。",
+      "sourceType": "user",
+      "sourceTitle": "本应用整理",
+      "license": "original"
+    },
+    {
+      "id": "feeling-07",
+      "category": "feeling",
+      "cantonese": "真可惜。",
+      "simplified": "真可惜。",
+      "mandarinGloss": "真可惜。",
+      "sourceType": "user",
+      "sourceTitle": "本应用整理",
+      "license": "original"
+    },
+    {
+      "id": "feeling-08",
+      "category": "feeling",
       "cantonese": "佢成日讲笑。",
       "simplified": "他经常开玩笑。",
       "mandarinGloss": "他经常开玩笑。",
+      "sourceType": "user",
+      "sourceTitle": "本应用整理",
+      "license": "original"
+    },
+    {
+      "id": "contact-01",
+      "category": "contact",
+      "cantonese": "我打俾你。",
+      "simplified": "我打给你。",
+      "mandarinGloss": "我打给你。",
+      "sourceType": "user",
+      "sourceTitle": "本应用整理",
+      "license": "original"
+    },
+    {
+      "id": "contact-02",
+      "category": "contact",
+      "cantonese": "你收到我个讯息未？",
+      "simplified": "你收到我的消息了吗？",
+      "mandarinGloss": "你收到我的消息了吗？",
+      "sourceType": "user",
+      "sourceTitle": "本应用整理",
+      "license": "original"
+    },
+    {
+      "id": "contact-03",
+      "category": "contact",
+      "cantonese": "呢度讯号唔好。",
+      "simplified": "这里信号不好。",
+      "mandarinGloss": "这里信号不好。",
+      "sourceType": "user",
+      "sourceTitle": "本应用整理",
+      "license": "original"
+    },
+    {
+      "id": "contact-04",
+      "category": "contact",
+      "cantonese": "我而家讲紧电话。",
+      "simplified": "我正在打电话。",
+      "mandarinGloss": "我正在打电话。",
+      "sourceType": "user",
+      "sourceTitle": "本应用整理",
+      "license": "original"
+    },
+    {
+      "id": "contact-05",
+      "category": "contact",
+      "cantonese": "阵间再打过俾你。",
+      "simplified": "一会儿再打给你。",
+      "mandarinGloss": "一会儿再打给你。",
+      "sourceType": "user",
+      "sourceTitle": "本应用整理",
+      "license": "original"
+    },
+    {
+      "id": "contact-06",
+      "category": "contact",
+      "cantonese": "你电话号码系几多？",
+      "simplified": "你的电话号码是多少？",
+      "mandarinGloss": "你的电话号码是多少？",
+      "sourceType": "user",
+      "sourceTitle": "本应用整理",
+      "license": "original"
+    },
+    {
+      "id": "contact-07",
+      "category": "contact",
+      "cantonese": "我发讯息俾你。",
+      "simplified": "我发消息给你。",
+      "mandarinGloss": "我发消息给你。",
+      "sourceType": "user",
+      "sourceTitle": "本应用整理",
+      "license": "original"
+    },
+    {
+      "id": "plans-01",
+      "category": "plans",
+      "cantonese": "我哋一齐去睇戏啦。",
+      "simplified": "我们一起去看电影吧。",
+      "mandarinGloss": "我们一起去看电影吧。",
+      "sourceType": "user",
+      "sourceTitle": "本应用整理",
+      "license": "original"
+    },
+    {
+      "id": "plans-02",
+      "category": "plans",
+      "cantonese": "听日得唔得闲？",
+      "simplified": "明天有空吗？",
+      "mandarinGloss": "明天有空吗？",
+      "sourceType": "user",
+      "sourceTitle": "本应用整理",
+      "license": "original"
+    },
+    {
+      "id": "plans-03",
+      "category": "plans",
+      "cantonese": "三点门口等。",
+      "simplified": "三点在门口等。",
+      "mandarinGloss": "三点在门口等。",
+      "sourceType": "user",
+      "sourceTitle": "本应用整理",
+      "license": "original"
+    },
+    {
+      "id": "plans-04",
+      "category": "plans",
+      "cantonese": "我可能迟少少。",
+      "simplified": "我可能会晚一点。",
+      "mandarinGloss": "我可能会晚一点。",
+      "sourceType": "user",
+      "sourceTitle": "本应用整理",
+      "license": "original"
+    },
+    {
+      "id": "plans-05",
+      "category": "plans",
+      "cantonese": "改期得唔得？",
+      "simplified": "改期行不行？",
+      "mandarinGloss": "改期行不行？",
+      "sourceType": "user",
+      "sourceTitle": "本应用整理",
+      "license": "original"
+    },
+    {
+      "id": "plans-06",
+      "category": "plans",
+      "cantonese": "我到咗，你喺边？",
+      "simplified": "我到了，你在哪？",
+      "mandarinGloss": "我到了，你在哪？",
+      "sourceType": "user",
+      "sourceTitle": "本应用整理",
+      "license": "original"
+    },
+    {
+      "id": "plans-07",
+      "category": "plans",
+      "cantonese": "你喺边度等我？",
+      "simplified": "你在哪里等我？",
+      "mandarinGloss": "你在哪里等我？",
+      "sourceType": "user",
+      "sourceTitle": "本应用整理",
+      "license": "original"
+    },
+    {
+      "id": "plans-08",
+      "category": "plans",
+      "cantonese": "今个周末有冇安排？",
+      "simplified": "这个周末有安排吗？",
+      "mandarinGloss": "这个周末有安排吗？",
+      "sourceType": "user",
+      "sourceTitle": "本应用整理",
+      "license": "original"
+    },
+    {
+      "id": "courtesy-01",
+      "category": "courtesy",
+      "cantonese": "唔该。",
+      "simplified": "麻烦你。",
+      "mandarinGloss": "麻烦你。",
+      "sourceType": "user",
+      "sourceTitle": "本应用整理",
+      "license": "original"
+    },
+    {
+      "id": "courtesy-02",
+      "category": "courtesy",
+      "cantonese": "多谢你。",
+      "simplified": "谢谢你。",
+      "mandarinGloss": "谢谢你。",
+      "sourceType": "user",
+      "sourceTitle": "本应用整理",
+      "license": "original"
+    },
+    {
+      "id": "courtesy-03",
+      "category": "courtesy",
+      "cantonese": "对唔住。",
+      "simplified": "对不起。",
+      "mandarinGloss": "对不起。",
+      "sourceType": "user",
+      "sourceTitle": "本应用整理",
+      "license": "original"
+    },
+    {
+      "id": "courtesy-04",
+      "category": "courtesy",
+      "cantonese": "唔使客气。",
+      "simplified": "不用客气。",
+      "mandarinGloss": "不用客气。",
+      "sourceType": "user",
+      "sourceTitle": "本应用整理",
+      "license": "original"
+    },
+    {
+      "id": "courtesy-05",
+      "category": "courtesy",
+      "cantonese": "唔好意思，阻你一阵。",
+      "simplified": "不好意思，耽误你一下。",
+      "mandarinGloss": "不好意思，耽误你一下。",
+      "sourceType": "user",
+      "sourceTitle": "本应用整理",
+      "license": "original"
+    },
+    {
+      "id": "courtesy-06",
+      "category": "courtesy",
+      "cantonese": "得闲饮茶。",
+      "simplified": "有空一起喝茶。",
+      "mandarinGloss": "有空一起喝茶。",
+      "sourceType": "user",
+      "sourceTitle": "本应用整理",
+      "license": "original"
+    },
+    {
+      "id": "courtesy-07",
+      "category": "courtesy",
+      "cantonese": "拜托你喇。",
+      "simplified": "拜托你了。",
+      "mandarinGloss": "拜托你了。",
+      "sourceType": "user",
+      "sourceTitle": "本应用整理",
+      "license": "original"
+    },
+    {
+      "id": "courtesy-08",
+      "category": "courtesy",
+      "cantonese": "唔该借借。",
+      "simplified": "不好意思，借过。",
+      "mandarinGloss": "不好意思，借过。",
+      "sourceType": "user",
+      "sourceTitle": "本应用整理",
+      "license": "original"
+    },
+    {
+      "id": "help-01",
+      "category": "help",
+      "cantonese": "救命呀。",
+      "simplified": "救命。",
+      "mandarinGloss": "救命。",
+      "sourceType": "user",
+      "sourceTitle": "本应用整理",
+      "license": "original"
+    },
+    {
+      "id": "help-02",
+      "category": "help",
+      "cantonese": "我唔见咗银包。",
+      "simplified": "我的钱包不见了。",
+      "mandarinGloss": "我的钱包不见了。",
+      "sourceType": "user",
+      "sourceTitle": "本应用整理",
+      "license": "original"
+    },
+    {
+      "id": "help-03",
+      "category": "help",
+      "cantonese": "快啲报警。",
+      "simplified": "快点报警。",
+      "mandarinGloss": "快点报警。",
+      "sourceType": "user",
+      "sourceTitle": "本应用整理",
+      "license": "original"
+    },
+    {
+      "id": "help-04",
+      "category": "help",
+      "cantonese": "呢度有人受伤。",
+      "simplified": "这里有人受伤。",
+      "mandarinGloss": "这里有人受伤。",
+      "sourceType": "user",
+      "sourceTitle": "本应用整理",
+      "license": "original"
+    },
+    {
+      "id": "help-05",
+      "category": "help",
+      "cantonese": "我要去医院。",
+      "simplified": "我要去医院。",
+      "mandarinGloss": "我要去医院。",
+      "sourceType": "user",
+      "sourceTitle": "本应用整理",
+      "license": "original"
+    },
+    {
+      "id": "help-06",
+      "category": "help",
+      "cantonese": "唔该帮我叫保安。",
+      "simplified": "请帮我叫保安。",
+      "mandarinGloss": "请帮我叫保安。",
+      "sourceType": "user",
+      "sourceTitle": "本应用整理",
+      "license": "original"
+    },
+    {
+      "id": "help-07",
+      "category": "help",
+      "cantonese": "我部电话冇电。",
+      "simplified": "我的手机没电了。",
+      "mandarinGloss": "我的手机没电了。",
       "sourceType": "user",
       "sourceTitle": "本应用整理",
       "license": "original"
