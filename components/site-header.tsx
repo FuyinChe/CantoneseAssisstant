@@ -3,7 +3,7 @@ import { siteName, siteNameEn } from "@/lib/site";
 
 const links = [
   { href: "/", label: "转换" },
-  { href: "/learn", label: "词汇" },
+  { href: "/learn", label: "日常短句" },
   { href: "/about", label: "关于" },
 ];
 

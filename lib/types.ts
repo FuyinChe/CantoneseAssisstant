@@ -12,8 +12,35 @@ export type PhraseEntry = {
   to: string;
 };
 
+export type ExampleCategory =
+  | "greeting"
+  | "weather"
+  | "directions"
+  | "food"
+  | "market"
+  | "shopping"
+  | "transport"
+  | "time"
+  | "home"
+  | "animal"
+  | "plant"
+  | "family"
+  | "kinship"
+  | "work"
+  | "study"
+  | "school"
+  | "sport"
+  | "health"
+  | "feeling"
+  | "contact"
+  | "phone"
+  | "plans"
+  | "courtesy"
+  | "help";
+
 export type Example = {
   id: string;
+  category?: ExampleCategory;
   traditional: string;
   simplified: string;
   cantonese: string;
