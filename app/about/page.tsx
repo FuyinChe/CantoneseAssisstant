@@ -3,7 +3,7 @@ export default function AboutPage() {
     <article className="mx-auto flex w-full max-w-3xl flex-col gap-4 px-4 py-6 text-sm leading-7">
       <h1 className="text-2xl font-semibold">关于</h1>
       <p>
-        粤语助手是个人、非商业的学习工具。简体或繁体都可以输入：简体标拼音，并给出英文机器翻译；台湾繁体标注音，香港字形再换成粤语书面说法并标粤拼。普通话、英语、台湾国语和粤语各用浏览器里对应的语音播放。英文翻译会把简体句子发送到在线翻译服务。
+        粤语助手是个人、非商业的学习工具。简体或繁体都可以输入：简体标拼音，并给出英文机器翻译；台湾繁体标注音，香港字形再换成粤语书面说法并标粤拼。朗读优先使用在线神经语音：普通话晓晓、台湾国语晓臻、粤语晓曼、英语 Aria。句子会送到在线语音服务；若暂时读不了，再改用这台设备自己的语音。英文翻译也会把简体句子发送到在线翻译服务。
       </p>
       <p>
         粤典 words.hk 没有可供实时调用的查询接口。完整词典以《非商业开放资料授权协议 1.0》发布，必须署名，不能用于商业。把
@@ -27,9 +27,9 @@ export default function AboutPage() {
       <p>
         第一版的改写走词库。
         <code className="mx-1">lib/rewrite/llm.ts</code>
-        和
-        <code className="mx-1">lib/speech/cloud.ts</code>
-        留作以后的大模型与云端语音，当前页面不会调用它们。
+        留作以后的大模型改写，当前页面不会调用它。朗读默认走 Edge 在线语音；把
+        <code className="mx-1">TTS_PROVIDER</code>
+        设为 azure 并填上微软语音密钥后，会改用同一批神经声线。
       </p>
       <ul className="list-disc pl-5">
         <li>

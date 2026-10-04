@@ -2,10 +2,8 @@
 
 import { useEffect, useState } from "react";
 import type { JyutpingToken } from "@/lib/jyutping";
-import { BrowserSpeech } from "@/lib/speech/browser";
+import { learningSpeech } from "@/lib/speech/player";
 import type { SpeechLang } from "@/lib/speech/types";
-
-const engine = new BrowserSpeech();
 const hanPattern = /\p{Script=Han}/u;
 
 export function ReadingLine({
@@ -40,7 +38,7 @@ export function ReadingLine({
 
   function speak(token: string) {
     setError("");
-    void engine.speak(token, lang).catch((reason: Error) => setError(reason.message));
+    void learningSpeech.speak(token, lang).catch((reason: Error) => setError(reason.message));
   }
 
   return (

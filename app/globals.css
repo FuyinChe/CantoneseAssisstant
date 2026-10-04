@@ -46,3 +46,79 @@ textarea,
 select {
   font-family: inherit;
 }
+
+.stroke-box,
+.practice-box {
+  display: block;
+  width: var(--box);
+  height: var(--box);
+  background: #fff;
+}
+
+.stroke-box {
+  border: 1px solid #d6d3d1;
+}
+
+.practice-frame {
+  fill: #fff;
+  stroke: #44403c;
+}
+
+.tianzi-line {
+  stroke: #78716c;
+  stroke-width: 1;
+  stroke-dasharray: 4 3;
+}
+
+.stroke-print {
+  --box: 28mm;
+  --box-gap: 2.5mm;
+  position: fixed;
+  inset: 0;
+  z-index: 50;
+  overflow: auto;
+  background: #fff;
+  color: #1c1917;
+}
+
+.stroke-print[data-box="small"] {
+  --box: 16mm;
+  --box-gap: 1.8mm;
+}
+
+@media print {
+  @page {
+    size: A4;
+    margin: 12mm;
+  }
+
+  body > :not(.stroke-print) {
+    display: none !important;
+  }
+
+  .stroke-print {
+    position: static;
+    overflow: visible;
+    background: #fff;
+    color: #000;
+  }
+
+  .stroke-print article {
+    max-width: none;
+    width: 100%;
+    padding: 0;
+  }
+
+  .stroke-print .no-print {
+    display: none !important;
+  }
+
+  .stroke-box,
+  .stroke-box path,
+  .practice-box,
+  .practice-frame,
+  .tianzi-line {
+    print-color-adjust: exact;
+    -webkit-print-color-adjust: exact;
+  }
+}

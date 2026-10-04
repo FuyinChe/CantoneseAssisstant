@@ -7,6 +7,7 @@ import { PinyinLine } from "@/components/pinyin-line";
 import { ZhuyinLine } from "@/components/zhuyin-line";
 import { OcrPanel } from "@/components/ocr-panel";
 import { PlayButton } from "@/components/play-button";
+import { StrokeSheet } from "@/components/stroke-sheet";
 import { convertText } from "@/lib/convert";
 import { glyphMarks } from "@/lib/glyphs";
 import type { Conversion } from "@/lib/types";
@@ -48,8 +49,11 @@ function GlyphComparison({ result }: { result: Conversion }) {
       </div>
       <div className="flex flex-col divide-y divide-line px-4">
         <div className="flex flex-col gap-3 py-5">
-          <h3 className="text-sm font-semibold">香港繁体</h3>
-          <p className="text-xs text-muted">只改香港用字，口头说法不变。后面会变成後面。</p>
+          <div className="flex items-center justify-between gap-3">
+            <h3 className="text-sm font-semibold">香港繁体</h3>
+            <StrokeSheet text={result.traditional} />
+          </div>
+          <p className="text-xs text-muted">只改香港用字，口头说法不变。后面会变成後面。可以打印成带笔顺的工作纸。</p>
           <GlyphText text={result.traditional} marks={hongKongMarks} />
         </div>
         <div className="flex flex-col gap-3 py-5">
@@ -98,23 +102,25 @@ export function Workspace() {
 
   return (
     <div className="mx-auto flex w-full max-w-5xl flex-col gap-6 px-4 py-6">
-      <section className="flex flex-col gap-3 rounded-2xl border border-line bg-card p-4">
-        <div>
-          <label className="text-sm font-medium" htmlFor="source-text">
+      <section className="overflow-hidden rounded-2xl border border-line bg-card">
+        <div className="border-b border-line bg-background px-4 py-3">
+          <label className="text-sm font-semibold" htmlFor="source-text">
             输入
           </label>
           <p className="mt-1 text-xs text-muted">
             直接输入，或拍照、上传图片后识别整张或拖选一块。简体、繁体都可以。图片不会上传。
           </p>
         </div>
-        <textarea
-          id="source-text"
-          className="min-h-32 rounded-xl border border-line bg-background p-4 text-lg outline-none focus:border-accent"
-          value={input}
-          onChange={(event) => setInput(event.target.value)}
-          placeholder="简体或繁体都可以，例如：我不知道后面怎么走。"
-        />
-        <OcrPanel onText={setInput} />
+        <div className="flex flex-col gap-3 p-4">
+          <textarea
+            id="source-text"
+            className="min-h-32 rounded-xl border border-line bg-background p-4 text-lg outline-none focus:border-accent"
+            value={input}
+            onChange={(event) => setInput(event.target.value)}
+            placeholder="简体或繁体都可以，例如：我不知道后面怎么走。"
+          />
+          <OcrPanel onText={setInput} />
+        </div>
       </section>
 
       <section className="flex flex-col gap-4">

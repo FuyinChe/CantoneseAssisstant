@@ -1,17 +1,9 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { BrowserSpeech, findVoice } from "@/lib/speech/browser";
+import { useState } from "react";
+import { neuralVoices } from "@/lib/speech/catalog";
+import { learningSpeech } from "@/lib/speech/player";
 import type { SpeechLang } from "@/lib/speech/types";
-
-const engine = new BrowserSpeech();
-
-const warnings: Record<SpeechLang, string> = {
-  "zh-CN": "这部设备没有列出普通话语音，浏览器可能会改用其他中文语音。",
-  "zh-HK": "这部设备没有列出粤语语音。macOS 和 iOS 通常有 Sinji；桌面版 Chrome 经常没有粤语语音。",
-  "zh-TW": "这部设备没有列出台湾国语语音。macOS 通常有美佳（Meijia）。",
-  "en-US": "这部设备没有列出英语语音。",
-};
 
 export function PlayButton({
   text,
@@ -22,43 +14,28 @@ export function PlayButton({
   lang: SpeechLang;
   label: string;
 }) {
-  const [ready, setReady] = useState(false);
-  const [voiceLabel, setVoiceLabel] = useState("");
   const [error, setError] = useState("");
-
-  useEffect(() => {
-    const update = () => {
-      const voices = window.speechSynthesis?.getVoices() ?? [];
-      if (voices.length === 0) return;
-      const voice = findVoice(lang);
-      setVoiceLabel(voice ? `${voice.name} · ${voice.lang}` : "");
-      setReady(true);
-    };
-    update();
-    window.speechSynthesis?.addEventListener("voiceschanged", update);
-    const timer = window.setTimeout(() => setReady(true), 800);
-    return () => {
-      window.speechSynthesis?.removeEventListener("voiceschanged", update);
-      window.clearTimeout(timer);
-    };
-  }, [lang]);
+  const voiceLabel = neuralVoices[lang].label;
 
   return (
     <div className="flex flex-col items-start gap-1">
       <button
         type="button"
-        className="rounded-full bg-accent px-4 py-2 text-sm text-white disabled:opacity-40"
+        className="inline-flex h-10 w-10 items-center justify-center rounded-full bg-accent text-white disabled:opacity-40"
+        aria-label={label}
+        title={label}
         disabled={!text.trim()}
         onClick={() => {
           setError("");
-          void engine.speak(text, lang).catch((reason: Error) => setError(reason.message));
+          void learningSpeech.speak(text, lang).catch((reason: Error) => setError(reason.message));
         }}
       >
-        {label}
+        <svg viewBox="0 0 24 24" className="h-5 w-5" aria-hidden="true">
+          <path fill="currentColor" d="M8 5.14v13.72a1 1 0 0 0 1.54.84l10.14-6.86a1 1 0 0 0 0-1.68L9.54 4.3A1 1 0 0 0 8 5.14z" />
+        </svg>
       </button>
-      {ready && voiceLabel ? <p className="text-sm text-muted">{voiceLabel}</p> : null}
-      {ready && !voiceLabel ? <p className="max-w-xs text-sm text-muted">{warnings[lang]}</p> : null}
-      {error ? <p className="text-sm text-accent">{error}</p> : null}
+      <p className="text-sm text-muted">{voiceLabel}</p>
+      {error ? <p className="max-w-xs text-sm text-accent">{error}</p> : null}
     </div>
   );
 }

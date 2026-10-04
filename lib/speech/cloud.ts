@@ -1,14 +1,16 @@
-import type { SpeechEngine, SpeechLang } from "./types";
+import { synthesizeAzure } from "./azure";
+import { synthesizeEdge } from "./edge";
+import type { SpeechLang } from "./types";
 
-/**
- * Reserved cloud speech path. This version does not call Azure or Google
- * and is not imported by the app.
- */
-export class CloudSpeech implements SpeechEngine {
-  readonly id = "cloud" as const;
+export function speechProvider() {
+  const provider = (process.env.TTS_PROVIDER ?? "edge").trim().toLowerCase();
+  if (provider === "azure" || provider === "browser") return provider;
+  return "edge";
+}
 
-  async speak(_text: string, lang: SpeechLang) {
-    const provider = process.env.TTS_PROVIDER ?? "unset";
-    throw new Error(`云端语音尚未接入（TTS_PROVIDER=${provider}，语言 ${lang}）。`);
-  }
+export async function synthesizeSpeech(text: string, lang: SpeechLang) {
+  const provider = speechProvider();
+  if (provider === "azure") return synthesizeAzure(text, lang);
+  if (provider === "browser") throw new Error("当前设置为只使用本机语音。");
+  return synthesizeEdge(text, lang);
 }
