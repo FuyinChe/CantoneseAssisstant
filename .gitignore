@@ -32,6 +32,11 @@ yarn-error.log*
 
 # env files (can opt-in for committing if needed)
 .env*
+!.env.example
+
+# words.hk / CC-Canto source dumps. Built JSON in data/ is committed.
+/data/raw/*
+!/data/raw/.gitkeep
 
 # vercel
 .vercel

@@ -6,12 +6,17 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "lexicon": "node scripts/build-lexicon.mjs"
   },
   "dependencies": {
     "next": "16.3.8",
+    "opencc-js": "^1.4.2",
+    "pinyin-pro": "^3.29.4",
     "react": "19.2.8",
-    "react-dom": "19.2.8"
+    "react-dom": "19.2.8",
+    "tesseract.js": "^7.0.0",
+    "to-jyutping": "^3.1.1"
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4",

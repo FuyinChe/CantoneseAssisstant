@@ -1,0 +1,1 @@
+Place an optional words.hk dump here as all.csv or all.csv.gz, and an optional CC-Canto file as cccanto.txt. Then run npm run lexicon. These source files are gitignored.

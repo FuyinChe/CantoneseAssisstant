@@ -1,0 +1,269 @@
+{
+  "examples": [
+    {
+      "id": "daily-01",
+      "traditional": "我不知道怎麼走。",
+      "simplified": "我不知道怎么走。",
+      "cantonese": "我唔知点行。",
+      "jyutping": "ngo5 m4 zi1 dim2 haang4.",
+      "mandarinGloss": "我不知道怎么走。",
+      "sourceType": "user",
+      "sourceTitle": "本应用整理",
+      "license": "original",
+      "note": "问路。影视、新闻和社交媒体例句请在词汇页自行录入，并注明出处。"
+    },
+    {
+      "id": "daily-02",
+      "traditional": "你吃飯了嗎？",
+      "simplified": "你吃饭了吗？",
+      "cantonese": "你食咗饭未？",
+      "jyutping": "nei5 sik6 zo2 faan6 mei6?",
+      "mandarinGloss": "你吃饭了吗？",
+      "sourceType": "user",
+      "sourceTitle": "本应用整理",
+      "license": "original"
+    },
+    {
+      "id": "daily-03",
+      "traditional": "今天天氣很好。",
+      "simplified": "今天天气很好。",
+      "cantonese": "今日天气好好。",
+      "jyutping": "gam1 jat6 tin1 hei3 hou2 hou2.",
+      "mandarinGloss": "今天天气很好。",
+      "sourceType": "user",
+      "sourceTitle": "本应用整理",
+      "license": "original"
+    },
+    {
+      "id": "daily-04",
+      "traditional": "這是什麼？",
+      "simplified": "这是什么？",
+      "cantonese": "呢个系咩？",
+      "jyutping": "ni1 go3 hai6 me1?",
+      "mandarinGloss": "这是什么？",
+      "sourceType": "user",
+      "sourceTitle": "本应用整理",
+      "license": "original"
+    },
+    {
+      "id": "daily-05",
+      "traditional": "我現在沒有時間。",
+      "simplified": "我现在没有时间。",
+      "cantonese": "我而家冇时间。",
+      "jyutping": "ngo5 ji4 gaa1 mou5 si4 gaan3.",
+      "mandarinGloss": "我现在没有时间。",
+      "sourceType": "user",
+      "sourceTitle": "本应用整理",
+      "license": "original"
+    },
+    {
+      "id": "daily-06",
+      "traditional": "他們明天才回來。",
+      "simplified": "他们明天才回来。",
+      "cantonese": "佢哋听日先返嚟。",
+      "jyutping": "keoi5 dei6 ting1 jat6 sin1 faan1 lai4.",
+      "mandarinGloss": "他们明天才回来。",
+      "sourceType": "user",
+      "sourceTitle": "本应用整理",
+      "license": "original"
+    },
+    {
+      "id": "daily-07",
+      "traditional": "請給我一杯水。",
+      "simplified": "请给我一杯水。",
+      "cantonese": "唔该畀我一杯水。",
+      "jyutping": "m4 goi1 bei2 ngo5 jat1 bui1 seoi2.",
+      "mandarinGloss": "请给我一杯水。",
+      "sourceType": "user",
+      "sourceTitle": "本应用整理",
+      "license": "original"
+    },
+    {
+      "id": "daily-08",
+      "traditional": "多少錢？",
+      "simplified": "多少钱？",
+      "cantonese": "几多钱呀？",
+      "jyutping": "gei1 do1 cin4 aa3?",
+      "mandarinGloss": "多少钱？",
+      "sourceType": "user",
+      "sourceTitle": "本应用整理",
+      "license": "original"
+    },
+    {
+      "id": "daily-09",
+      "traditional": "我很喜歡吃麪。",
+      "simplified": "我很喜欢吃面。",
+      "cantonese": "我好钟意食面。",
+      "jyutping": "ngo5 hou2 zung1 ji3 sik6 min6.",
+      "mandarinGloss": "我很喜欢吃面。",
+      "sourceType": "user",
+      "sourceTitle": "本应用整理",
+      "license": "original"
+    },
+    {
+      "id": "daily-10",
+      "traditional": "現在正在下雨。",
+      "simplified": "现在正在下雨。",
+      "cantonese": "而家落紧雨。",
+      "jyutping": "ji4 gaa1 lok6 gan2 jyu5.",
+      "mandarinGloss": "现在正在下雨。",
+      "sourceType": "user",
+      "sourceTitle": "本应用整理",
+      "license": "original"
+    },
+    {
+      "id": "daily-11",
+      "traditional": "你住在哪裏？",
+      "simplified": "你住在哪里？",
+      "cantonese": "你住喺边度？",
+      "jyutping": "nei5 zyu6 hai2 bin1 dou6?",
+      "mandarinGloss": "你住在哪里？",
+      "sourceType": "user",
+      "sourceTitle": "本应用整理",
+      "license": "original"
+    },
+    {
+      "id": "daily-12",
+      "traditional": "我昨天才見到他。",
+      "simplified": "我昨天才见到他。",
+      "cantonese": "我琴日先见到佢。",
+      "jyutping": "ngo5 kam4 jat6 sin1 gin3 dou2 keoi5.",
+      "mandarinGloss": "我昨天才见到他。",
+      "sourceType": "user",
+      "sourceTitle": "本应用整理",
+      "license": "original"
+    },
+    {
+      "id": "daily-13",
+      "traditional": "不用客氣。",
+      "simplified": "不用客气。",
+      "cantonese": "唔使客气。",
+      "jyutping": "m4 sai2 haak3 hei3.",
+      "mandarinGloss": "不用客气。",
+      "sourceType": "user",
+      "sourceTitle": "本应用整理",
+      "license": "original"
+    },
+    {
+      "id": "daily-14",
+      "traditional": "我搞定了。",
+      "simplified": "我搞定了。",
+      "cantonese": "我搞掂咗。",
+      "jyutping": "ngo5 gaau2 dim6 zo2.",
+      "mandarinGloss": "我搞定了。",
+      "sourceType": "user",
+      "sourceTitle": "本应用整理",
+      "license": "original"
+    },
+    {
+      "id": "daily-15",
+      "traditional": "等我一下。",
+      "simplified": "等我一下。",
+      "cantonese": "等我一阵。",
+      "jyutping": "dang2 ngo5 jat1 zan6.",
+      "mandarinGloss": "等我一下。",
+      "sourceType": "user",
+      "sourceTitle": "本应用整理",
+      "license": "original"
+    },
+    {
+      "id": "daily-16",
+      "traditional": "你會不會説粵語？",
+      "simplified": "你会不会说粤语？",
+      "cantonese": "你识唔识讲广东话？",
+      "jyutping": "nei5 sik1 m4 sik1 gong2 gwong2 dung1 waa2?",
+      "mandarinGloss": "你会不会说粤语？",
+      "sourceType": "user",
+      "sourceTitle": "本应用整理",
+      "license": "original"
+    },
+    {
+      "id": "daily-17",
+      "traditional": "我聽不懂，可不可以講慢一點？",
+      "simplified": "我听不懂，可不可以讲慢一点？",
+      "cantonese": "我听唔明，可唔可以讲慢啲？",
+      "jyutping": "ngo5 ting1 m4 ming4, ho2 m4 ho2 ji5 gong2 maan6 di1?",
+      "mandarinGloss": "我听不懂，可不可以讲慢一点？",
+      "sourceType": "user",
+      "sourceTitle": "本应用整理",
+      "license": "original"
+    },
+    {
+      "id": "daily-18",
+      "traditional": "我們一起去看電影吧。",
+      "simplified": "我们一起去看电影吧。",
+      "cantonese": "我哋一齐去睇戏啦。",
+      "jyutping": "ngo5 dei6 jat1 cai4 heoi3 tai2 hei3 laa1.",
+      "mandarinGloss": "我们一起去看电影吧。",
+      "sourceType": "user",
+      "sourceTitle": "本应用整理",
+      "license": "original"
+    },
+    {
+      "id": "daily-19",
+      "traditional": "這裏很近，走路就行。",
+      "simplified": "这里很近，走路就行。",
+      "cantonese": "呢度好近，行路得啦。",
+      "jyutping": "nei1 dou6 hou2 gan6, haang4 lou6 dak1 laa1.",
+      "mandarinGloss": "这里很近，走路就行。",
+      "sourceType": "user",
+      "sourceTitle": "本应用整理",
+      "license": "original"
+    },
+    {
+      "id": "daily-20",
+      "traditional": "對不起，我遲到了。",
+      "simplified": "对不起，我迟到了。",
+      "cantonese": "对唔住，我迟到咗。",
+      "jyutping": "deoi3 m4 zyu6, ngo5 ci4 dou3 zo2.",
+      "mandarinGloss": "对不起，我迟到了。",
+      "sourceType": "user",
+      "sourceTitle": "本应用整理",
+      "license": "original"
+    },
+    {
+      "id": "daily-21",
+      "traditional": "你叫什麼名字？",
+      "simplified": "你叫什么名字？",
+      "cantonese": "你叫咩名？",
+      "jyutping": "nei5 giu3 me1 meng2?",
+      "mandarinGloss": "你叫什么名字？",
+      "sourceType": "user",
+      "sourceTitle": "本应用整理",
+      "license": "original"
+    },
+    {
+      "id": "daily-22",
+      "traditional": "我還沒吃早餐。",
+      "simplified": "我还没吃早餐。",
+      "cantonese": "我仲未食早餐。",
+      "jyutping": "ngo5 zung6 mei6 sik6 zou2 caan1.",
+      "mandarinGloss": "我还没吃早餐。",
+      "sourceType": "user",
+      "sourceTitle": "本应用整理",
+      "license": "original"
+    },
+    {
+      "id": "daily-23",
+      "traditional": "快點回家吧。",
+      "simplified": "快点回家吧。",
+      "cantonese": "快啲返屋企啦。",
+      "jyutping": "faai3 di1 faan1 uk1 kei2 laa1.",
+      "mandarinGloss": "快点回家吧。",
+      "sourceType": "user",
+      "sourceTitle": "本应用整理",
+      "license": "original"
+    },
+    {
+      "id": "daily-24",
+      "traditional": "他經常開玩笑。",
+      "simplified": "他经常开玩笑。",
+      "cantonese": "佢成日讲笑。",
+      "jyutping": "keoi5 seng4 jat6 gong2 siu3.",
+      "mandarinGloss": "他经常开玩笑。",
+      "sourceType": "user",
+      "sourceTitle": "本应用整理",
+      "license": "original"
+    }
+  ]
+}
