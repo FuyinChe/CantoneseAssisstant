@@ -40,6 +40,9 @@ export function VariantLine({
     <div className="flex flex-col gap-2">
       <p className="flex min-h-16 flex-wrap items-start gap-x-3 gap-y-2">
         {chars.map((char, index) => {
+          if (char === "\n" || char === "\r") {
+            return <span key={`nl-${index}`} className="h-2 w-full basis-full" aria-hidden="true" />;
+          }
           const options = slots[index] ?? [];
           const choices = options.length > 1;
           const speakable = hanPattern.test(char);
