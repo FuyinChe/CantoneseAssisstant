@@ -8,34 +8,21 @@ import { ZhuyinLine } from "@/components/zhuyin-line";
 import { OcrPanel } from "@/components/ocr-panel";
 import { PlayButton } from "@/components/play-button";
 import { StrokeSheet } from "@/components/stroke-sheet";
-import { convertText } from "@/lib/convert";
+import { convertText, rewriteCantonese } from "@/lib/convert";
 import { glyphMarks } from "@/lib/glyphs";
 import { useLocale } from "@/lib/locale";
 import type { Conversion } from "@/lib/types";
+import { VariantLine } from "@/components/variant-line";
 
 const empty: Conversion = { simplified: "", traditional: "", taiwan: "", cantonese: "" };
 
-function GlyphText({ text, marks }: { text: string; marks: boolean[] }) {
-  if (!text) return <p className="min-h-16 text-lg">…</p>;
-  return (
-    <p className="flex min-h-16 flex-wrap items-start gap-x-3 gap-y-2">
-      {Array.from(text).map((char, index) => (
-        <span
-          key={`${char}-${index}`}
-          className={
-            marks[index]
-              ? "rounded-sm bg-accent-soft px-0.5 text-lg leading-none text-accent"
-              : "px-0.5 text-lg leading-none"
-          }
-        >
-          {char}
-        </span>
-      ))}
-    </p>
-  );
-}
-
-function GlyphComparison({ result }: { result: Conversion }) {
+function GlyphComparison({
+  result,
+  onTraditional,
+}: {
+  result: Conversion;
+  onTraditional: (text: string) => void;
+}) {
   const { t } = useLocale();
   const [hongKongMarks = [], taiwanMarks = [], simplifiedMarks = []] = glyphMarks([
     result.traditional,
@@ -54,7 +41,16 @@ function GlyphComparison({ result }: { result: Conversion }) {
             <StrokeSheet text={result.traditional} />
           </div>
           <p className="text-muted">{t.hongKongHint}</p>
-          <GlyphText text={result.traditional} marks={hongKongMarks} />
+          <VariantLine
+            key={`${result.simplified}|${result.taiwan}`}
+            text={result.traditional}
+            simplified={result.simplified}
+            marks={hongKongMarks}
+            lang="zh-HK"
+            speakLabel={t.playCantonese}
+            chooseLabel={t.variantPick}
+            onChange={onTraditional}
+          />
         </div>
         <div className="flex flex-col gap-3 border-t border-line pt-8">
           <h3 className="text-lg font-medium">{t.taiwan}</h3>
@@ -88,7 +84,7 @@ function GlyphComparison({ result }: { result: Conversion }) {
 
 export function Workspace() {
   const { t } = useLocale();
-  const [input, setInput] = useState("我不知道后面怎么走。");
+  const [input, setInput] = useState("今天天气怎么样？");
   const [result, setResult] = useState<Conversion>(empty);
 
   useEffect(() => {
@@ -127,7 +123,17 @@ export function Workspace() {
           <PlayButton text={result.cantonese} lang="zh-HK" label={t.playCantonese} />
         </div>
       </section>
-      <GlyphComparison result={result} />
+      <GlyphComparison
+        result={result}
+        onTraditional={(text) => {
+          setResult((current) => ({ ...current, traditional: text }));
+          void rewriteCantonese(text).then((cantonese) => {
+            setResult((current) =>
+              current.traditional === text ? { ...current, cantonese } : current,
+            );
+          });
+        }}
+      />
       <EnglishCard source={result.simplified} />
     </div>
   );

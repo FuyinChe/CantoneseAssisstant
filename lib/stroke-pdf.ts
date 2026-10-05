@@ -1,9 +1,12 @@
 import { PDFDocument, StandardFonts, rgb, type PDFFont, type PDFImage, type PDFPage } from "pdf-lib";
 import { siteName, siteNameEn, siteUrl } from "@/lib/site";
+import { glyphTransform, tianziMarks, tianziSvgMarks, TIANZI_INK } from "@/lib/tianzi";
 
 const FONT = '"PingFang HK", "Hiragino Sans CNS", "Noto Sans CJK HK", sans-serif';
 const A4: [number, number] = [595.28, 841.89];
-const MARGIN = (12 / 25.4) * 72;
+const SIDE = mm(12);
+const HEADER_SPACE = mm(14);
+const FOOTER_SPACE = mm(22);
 
 export type SheetBoxSize = "large" | "small";
 
@@ -34,7 +37,92 @@ type Cursor = {
 };
 
 function contentWidth() {
-  return A4[0] - MARGIN * 2;
+  return A4[0] - SIDE * 2;
+}
+
+function contentTop() {
+  return A4[1] - HEADER_SPACE;
+}
+
+function contentFloor() {
+  return FOOTER_SPACE;
+}
+
+function printDate() {
+  const now = new Date();
+  const year = now.getFullYear();
+  const month = String(now.getMonth() + 1).padStart(2, "0");
+  const day = String(now.getDate()).padStart(2, "0");
+  return `${year}-${month}-${day}`;
+}
+
+function pdfFilename(kind: string, sentence: string) {
+  const now = new Date();
+  const stamp = `${printDate()}-${String(now.getHours()).padStart(2, "0")}${String(now.getMinutes()).padStart(2, "0")}`;
+  const snippet = Array.from(sentence.replace(/\s+/g, "")).slice(0, 12).join("").replace(/[\\/:*?"<>|]/g, "");
+  return `${kind}${snippet ? `-${snippet}` : ""}-${stamp}.pdf`;
+}
+
+async function embedFooter(doc: PDFDocument, lines: string[]) {
+  const painted = paintLines(
+    lines.map((text) => ({ text, size: 9, weight: 400, color: "#78716c" })),
+    contentWidth(),
+  );
+  return {
+    image: await doc.embedPng(pngBytes(painted.canvas)),
+    width: painted.width,
+    height: painted.height,
+  };
+}
+
+function stampPages(
+  doc: PDFDocument,
+  font: PDFFont,
+  footer: { image: PDFImage; width: number; height: number },
+) {
+  const pages = doc.getPages();
+  const total = pages.length;
+  const date = printDate();
+  const mute = rgb(0.47, 0.44, 0.42);
+  const rule = rgb(0.89, 0.85, 0.78);
+  pages.forEach((page, index) => {
+    const width = page.getWidth();
+    const height = page.getHeight();
+    const label = `page ${index + 1} of ${total}`;
+    const labelWidth = font.widthOfTextAtSize(label, 9);
+    page.drawText(date, {
+      x: SIDE,
+      y: height - mm(10),
+      size: 9,
+      font,
+      color: mute,
+    });
+    page.drawText(label, {
+      x: width - SIDE - labelWidth,
+      y: height - mm(10),
+      size: 9,
+      font,
+      color: mute,
+    });
+    page.drawLine({
+      start: { x: SIDE, y: height - mm(12) },
+      end: { x: width - SIDE, y: height - mm(12) },
+      thickness: 0.4,
+      color: rule,
+    });
+    page.drawImage(footer.image, {
+      x: SIDE,
+      y: mm(8),
+      width: footer.width,
+      height: footer.height,
+    });
+    page.drawLine({
+      start: { x: SIDE, y: mm(8) + footer.height + 4 },
+      end: { x: width - SIDE, y: mm(8) + footer.height + 4 },
+      thickness: 0.4,
+      color: rule,
+    });
+  });
 }
 
 function escapeAttr(value: string) {
@@ -42,14 +130,10 @@ function escapeAttr(value: string) {
 }
 
 function tianzi(size: number) {
-  const mid = size / 2;
-  const line = (x1: number, y1: number, x2: number, y2: number) =>
-    `<line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" stroke="#78716c" stroke-width="1" stroke-dasharray="4 3"/>`;
-  return `${line(mid, 1, mid, size - 1)}${line(1, mid, size - 1, mid)}`;
+  return tianziSvgMarks(size);
 }
 
 function strokeSvg(strokes: string[], through: number, box: number) {
-  const scale = box / 1024;
   const paths = strokes.slice(0, through).map((path, index) => {
     const fill = index === through - 1 ? "#9c3b2e" : "#1f1a14";
     return `<path d="${escapeAttr(path)}" fill="${fill}"/>`;
@@ -57,7 +141,16 @@ function strokeSvg(strokes: string[], through: number, box: number) {
   return `<svg xmlns="http://www.w3.org/2000/svg" width="${box}" height="${box}" viewBox="0 0 ${box} ${box}">
     <rect x="0.5" y="0.5" width="${box - 1}" height="${box - 1}" fill="#ffffff" stroke="#d6d3d1"/>
     ${tianzi(box)}
-    <g transform="translate(0 ${box}) scale(${scale} ${-scale})">${paths}</g>
+    <g transform="${glyphTransform(box)}">${paths}</g>
+  </svg>`;
+}
+
+function modelSvg(strokes: string[], box: number) {
+  const paths = strokes.map((path) => `<path d="${escapeAttr(path)}" fill="#1f1a14"/>`).join("");
+  return `<svg xmlns="http://www.w3.org/2000/svg" width="${box}" height="${box}" viewBox="0 0 ${box} ${box}">
+    <rect x="0.5" y="0.5" width="${box - 1}" height="${box - 1}" fill="#ffffff" stroke="#44403c"/>
+    ${tianzi(box)}
+    <g transform="${glyphTransform(box)}">${paths}</g>
   </svg>`;
 }
 
@@ -66,6 +159,32 @@ function practiceSvg(box: number) {
     <rect x="0.5" y="0.5" width="${box - 1}" height="${box - 1}" fill="#ffffff" stroke="#44403c"/>
     ${tianzi(box)}
   </svg>`;
+}
+
+const hanPattern = /\p{Script=Han}/u;
+
+function punctCanvas(char: string, box: number) {
+  const canvas = document.createElement("canvas");
+  canvas.width = Math.ceil(box * GLYPH_RATIO);
+  canvas.height = Math.ceil(box * GLYPH_RATIO);
+  const context = canvas.getContext("2d");
+  if (!context) throw new Error("PDF 暂时没有保存下来。");
+  context.scale(GLYPH_RATIO, GLYPH_RATIO);
+  context.fillStyle = "#ffffff";
+  context.fillRect(0, 0, box, box);
+  context.strokeStyle = "#44403c";
+  context.lineWidth = 1;
+  context.strokeRect(0.5, 0.5, box - 1, box - 1);
+  context.fillStyle = TIANZI_INK;
+  for (const mark of tianziMarks(box)) {
+    context.fillRect(mark.x, mark.y, mark.w, mark.h);
+  }
+  context.fillStyle = "#1f1a14";
+  context.font = `500 ${box * 0.48}px ${FONT}`;
+  context.textAlign = "center";
+  context.textBaseline = "middle";
+  context.fillText(char, box / 2, box / 2 + box * 0.02);
+  return canvas;
 }
 
 function loadImage(src: string) {
@@ -143,9 +262,9 @@ function paintLines(lines: TextLine[], maxWidth: number) {
 }
 
 function ensure(doc: PDFDocument, cursor: Cursor, height: number) {
-  if (cursor.y - height >= MARGIN) return cursor;
+  if (cursor.y - height >= contentFloor()) return cursor;
   const page = doc.addPage(A4);
-  return { page, y: page.getHeight() - MARGIN };
+  return { page, y: contentTop() };
 }
 
 async function drawText(doc: PDFDocument, cursor: Cursor, lines: TextLine[], gapAfter: number, keepWith = 0) {
@@ -153,7 +272,7 @@ async function drawText(doc: PDFDocument, cursor: Cursor, lines: TextLine[], gap
   const image = await doc.embedPng(pngBytes(painted.canvas));
   const next = ensure(doc, cursor, painted.height + keepWith);
   next.page.drawImage(image, {
-    x: MARGIN,
+    x: SIDE,
     y: next.y - painted.height,
     width: painted.width,
     height: painted.height,
@@ -171,7 +290,7 @@ function drawBoxes(
 ) {
   const hasLabel = labels.some((label) => label);
   const rowHeight = layout.box + (hasLabel ? 12 : 0);
-  let x = MARGIN;
+  let x = SIDE;
   labels.forEach((label, index) => {
     const cell = Array.isArray(image) ? image[index] : image;
     cursor.page.drawImage(cell, { x, y: cursor.y - layout.box, width: layout.box, height: layout.box });
@@ -199,11 +318,16 @@ export async function downloadStrokePdf(input: {
   practiceBoxes?: number;
 }) {
   if (input.items.length === 0) throw new Error("还没有选择要打印的字。");
-  const layout = boxLayouts[input.boxSize ?? "large"];
+  const layout = boxLayouts[input.boxSize ?? "small"];
   const practiceBoxes = input.practiceBoxes ?? 5;
   const doc = await PDFDocument.create();
   doc.setTitle("香港繁体笔顺工作纸");
   const font = await doc.embedFont(StandardFonts.Helvetica);
+  const footer = await embedFooter(doc, [
+    "笔顺按 Make Me a Hanzi 的笔画数据绘出，供临写参考。",
+    `${siteName} · ${siteNameEn}`,
+    siteUrl,
+  ]);
   const practice = await doc.embedPng(pngBytes(await rasterSvg(practiceSvg(layout.box), layout.box)));
   const glyphs = new Map<string, PDFImage>();
   const jobs = new Map<string, Promise<HTMLCanvasElement>>();
@@ -225,7 +349,7 @@ export async function downloadStrokePdf(input: {
     glyphs.set(key, await doc.embedPng(pngBytes(await job)));
   }
 
-  let cursor: Cursor = { page: doc.addPage(A4), y: A4[1] - MARGIN };
+  let cursor: Cursor = { page: doc.addPage(A4), y: contentTop() };
   const header: TextLine[] = [
     { text: "香港繁体笔顺工作纸", size: 22, weight: 600, color: "#1c1917" },
     { text: input.sentence, size: 16, weight: 400, color: "#1c1917" },
@@ -236,7 +360,7 @@ export async function downloadStrokePdf(input: {
   cursor = await drawText(doc, cursor, header, 18);
 
   const perRow = Math.max(1, Math.floor((contentWidth() + layout.gap) / (layout.box + layout.gap)));
-  const pageRoom = A4[1] - MARGIN * 2;
+  const pageRoom = contentTop() - contentFloor();
   for (const item of input.items) {
     const strokeCount = item.strokes?.length ?? 0;
     const strokeRows = strokeCount > 0 ? Math.ceil(strokeCount / perRow) : 1;
@@ -246,8 +370,8 @@ export async function downloadStrokePdf(input: {
       + (strokeCount > 0 ? strokeRows * rowHeight : Math.ceil(11 * 1.35) + 8)
       + practiceRows * (layout.box + layout.gap)
       + 12;
-    if (sectionHeight <= pageRoom && cursor.y - MARGIN < sectionHeight) {
-      cursor = { page: doc.addPage(A4), y: A4[1] - MARGIN };
+    if (sectionHeight <= pageRoom && cursor.y - contentFloor() < sectionHeight) {
+      cursor = { page: doc.addPage(A4), y: contentTop() };
     }
     const follow = item.strokes && item.strokes.length > 0 ? layout.box + 16 : 28;
     cursor = await drawText(doc, cursor, [
@@ -277,18 +401,77 @@ export async function downloadStrokePdf(input: {
     cursor.y -= 12;
   }
 
-  cursor = await drawText(doc, cursor, [
-    { text: "笔顺按 Make Me a Hanzi 的笔画数据绘出，供临写参考。", size: 9, weight: 400, color: "#78716c" },
-    { text: `${siteName} · ${siteNameEn}`, size: 9, weight: 400, color: "#78716c" },
-    { text: siteUrl, size: 9, weight: 400, color: "#78716c" },
-  ], 0);
+  stampPages(doc, font, footer);
+  await savePdf(doc, pdfFilename("香港繁体笔顺工作纸", input.sentence));
+}
 
+export async function downloadCopyPdf(input: {
+  sentence: string;
+  truncated: boolean;
+  items: SheetItem[];
+  boxSize?: SheetBoxSize;
+}) {
+  if (input.items.length === 0) throw new Error("还没有选择要打印的字。");
+  const layout = boxLayouts[input.boxSize ?? "small"];
+  const doc = await PDFDocument.create();
+  doc.setTitle("香港繁体抄写工作纸");
+  const font = await doc.embedFont(StandardFonts.Helvetica);
+  const footer = await embedFooter(doc, [
+    "上一行范字，下一行田字格，供抄写。",
+    `${siteName} · ${siteNameEn}`,
+    siteUrl,
+  ]);
+  const practice = await doc.embedPng(pngBytes(await rasterSvg(practiceSvg(layout.box), layout.box)));
+  const models = new Map<string, PDFImage>();
+  const unique = [...new Set(input.items.map((item) => item.char))];
+  await Promise.all(unique.map(async (char) => {
+    const strokes = input.items.find((item) => item.char === char)?.strokes ?? [];
+    if (strokes.length > 0) {
+      models.set(char, await doc.embedPng(pngBytes(await rasterSvg(modelSvg(strokes, layout.box), layout.box))));
+    } else if (!hanPattern.test(char)) {
+      models.set(char, await doc.embedPng(pngBytes(punctCanvas(char, layout.box))));
+    } else {
+      models.set(char, practice);
+    }
+  }));
+
+  let cursor: Cursor = { page: doc.addPage(A4), y: contentTop() };
+  const header: TextLine[] = [
+    { text: "香港繁体抄写工作纸", size: 22, weight: 600, color: "#1c1917" },
+    { text: input.sentence, size: 16, weight: 400, color: "#1c1917" },
+  ];
+  if (input.truncated) {
+    header.push({ text: "句子较长，这张纸只排前 120 个字。", size: 11, weight: 400, color: "#57534e" });
+  }
+  cursor = await drawText(doc, cursor, header, 16);
+
+  const perRow = Math.max(1, Math.floor((contentWidth() + layout.gap) / (layout.box + layout.gap)));
+  const pairGap = layout.gap * 2;
+  for (let start = 0; start < input.items.length; start += perRow) {
+    const row = input.items.slice(start, start + perRow);
+    const pairHeight = layout.box * 2 + layout.gap * 2 + pairGap;
+    cursor = ensure(doc, cursor, pairHeight);
+    const images = row.map((item) => {
+      const image = models.get(item.char);
+      if (!image) throw new Error("PDF 暂时没有保存下来。");
+      return image;
+    });
+    cursor = drawBoxes(cursor, images, font, row.map(() => null), layout);
+    cursor = drawBoxes(cursor, practice, font, row.map(() => null), layout);
+    cursor.y -= pairGap;
+  }
+
+  stampPages(doc, font, footer);
+  await savePdf(doc, pdfFilename("香港繁体抄写工作纸", input.sentence));
+}
+
+async function savePdf(doc: PDFDocument, filename: string) {
   const bytes = await doc.save();
   const blob = new Blob([Uint8Array.from(bytes)], { type: "application/pdf" });
   const url = URL.createObjectURL(blob);
   const anchor = document.createElement("a");
   anchor.href = url;
-  anchor.download = "香港繁体笔顺工作纸.pdf";
+  anchor.download = filename;
   anchor.click();
   URL.revokeObjectURL(url);
 }

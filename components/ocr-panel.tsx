@@ -1,6 +1,6 @@
 "use client";
 
-import { useLayoutEffect, useRef, useState } from "react";
+import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { recognizeImage } from "@/lib/ocr";
 import { useLocale } from "@/lib/locale";
 
@@ -23,8 +23,12 @@ function DownArrow() {
 export function OcrPanel({ onText }: { onText: (text: string) => void }) {
   const { t } = useLocale();
   const viewRef = useRef<HTMLCanvasElement>(null);
+  const videoRef = useRef<HTMLVideoElement>(null);
+  const streamRef = useRef<MediaStream | null>(null);
+  const cameraInputRef = useRef<HTMLInputElement>(null);
   const imageRef = useRef<HTMLImageElement | null>(null);
   const dragRef = useRef<Selection | null>(null);
+  const [cameraOpen, setCameraOpen] = useState(false);
   const [selection, setSelection] = useState<Selection | null>(null);
   const [hasImage, setHasImage] = useState(false);
   const [preview, setPreview] = useState({ width: 1, height: 1 });
@@ -99,6 +103,7 @@ export function OcrPanel({ onText }: { onText: (text: string) => void }) {
   }
 
   function loadFile(file: File) {
+    stopCamera();
     const url = URL.createObjectURL(file);
     const image = new Image();
     image.onload = () => {
@@ -122,6 +127,95 @@ export function OcrPanel({ onText }: { onText: (text: string) => void }) {
     };
     image.src = url;
   }
+
+  function stopCamera() {
+    const stream = streamRef.current;
+    streamRef.current = null;
+    stream?.getTracks().forEach((track) => track.stop());
+    const video = videoRef.current;
+    if (video) video.srcObject = null;
+    setCameraOpen(false);
+  }
+
+  async function openCameraStream() {
+    const trials: MediaStreamConstraints[] = [
+      { audio: false, video: { facingMode: { exact: "environment" } } },
+      { audio: false, video: { facingMode: { ideal: "environment" } } },
+      { audio: false, video: true },
+    ];
+    let lastError: unknown;
+    for (const constraints of trials) {
+      try {
+        return await navigator.mediaDevices.getUserMedia(constraints);
+      } catch (reason) {
+        lastError = reason;
+      }
+    }
+    throw lastError instanceof Error ? lastError : new Error("camera");
+  }
+
+  async function startCamera() {
+    setError("");
+    setStatus("");
+    const nativeCapture = () => cameraInputRef.current?.click();
+    const mobile = /Mobi|Android|iPhone|iPad/i.test(navigator.userAgent);
+    if (mobile) {
+      nativeCapture();
+      return;
+    }
+    if (!navigator.mediaDevices?.getUserMedia) {
+      setError(t.cameraNeed);
+      return;
+    }
+    try {
+      const stream = await openCameraStream();
+      streamRef.current?.getTracks().forEach((track) => track.stop());
+      streamRef.current = stream;
+      setCameraOpen(true);
+    } catch {
+      setError(t.cameraNeed);
+    }
+  }
+
+  function shootPhoto() {
+    const video = videoRef.current;
+    if (!video || video.videoWidth < 2 || video.videoHeight < 2) {
+      setError(t.cameraNeed);
+      return;
+    }
+    const canvas = document.createElement("canvas");
+    canvas.width = video.videoWidth;
+    canvas.height = video.videoHeight;
+    const context = canvas.getContext("2d");
+    if (!context) return;
+    context.drawImage(video, 0, 0);
+    canvas.toBlob((blob) => {
+      stopCamera();
+      if (!blob) {
+        setError(t.cameraNeed);
+        return;
+      }
+      loadFile(new File([blob], "camera.jpg", { type: blob.type || "image/jpeg" }));
+    }, "image/jpeg", 0.92);
+  }
+
+  useEffect(() => {
+    if (!cameraOpen) return;
+    const video = videoRef.current;
+    const stream = streamRef.current;
+    if (!video || !stream) return;
+    video.srcObject = stream;
+    void video.play().catch(() => {
+      setError(t.cameraNeed);
+      stopCamera();
+    });
+  }, [cameraOpen, t.cameraNeed]);
+
+  useEffect(() => {
+    return () => {
+      streamRef.current?.getTracks().forEach((track) => track.stop());
+    };
+  }, []);
 
   async function recognizeSelection() {
     const image = imageRef.current;
@@ -157,8 +251,16 @@ export function OcrPanel({ onText }: { onText: (text: string) => void }) {
 
   return (
     <div className="flex flex-col gap-3">
-      <div className="flex flex-wrap gap-2">
-        <label className="relative inline-flex cursor-pointer items-center rounded-full bg-foreground px-4 py-2 text-[0.88rem] text-background">
+      <div className="relative flex flex-wrap gap-2">
+        <button
+          type="button"
+          className="rounded-full bg-foreground px-4 py-2 text-[0.88rem] text-background"
+          aria-label={t.cameraAria}
+          onClick={() => void startCamera()}
+        >
+          {t.camera}
+        </button>
+        <label className="relative inline-flex cursor-pointer items-center rounded-full border border-line bg-card px-4 py-2 text-[0.88rem]">
           {t.upload}
           <input
             className="absolute inset-0 cursor-pointer opacity-0"
@@ -172,6 +274,20 @@ export function OcrPanel({ onText }: { onText: (text: string) => void }) {
             }}
           />
         </label>
+        <input
+          ref={cameraInputRef}
+          className="pointer-events-none absolute h-0 w-0 overflow-hidden opacity-0"
+          type="file"
+          accept="image/*"
+          capture="environment"
+          aria-hidden="true"
+          tabIndex={-1}
+          onChange={(event) => {
+            const file = event.target.files?.[0];
+            event.target.value = "";
+            if (file) loadFile(file);
+          }}
+        />
         <button
           type="button"
           className="rounded-full border border-line bg-card px-4 py-2 text-[0.88rem]"
@@ -203,6 +319,34 @@ export function OcrPanel({ onText }: { onText: (text: string) => void }) {
           </button>
         ) : null}
       </div>
+      {cameraOpen ? (
+        <div className="flex flex-col gap-3">
+          <video
+            ref={videoRef}
+            className="max-h-[70vh] w-full rounded-lg border border-line bg-foreground object-cover"
+            autoPlay
+            muted
+            playsInline
+            aria-label={t.cameraAria}
+          />
+          <div className="flex flex-wrap gap-2">
+            <button
+              type="button"
+              className="rounded-full bg-foreground px-4 py-2 text-[0.88rem] text-background"
+              onClick={shootPhoto}
+            >
+              {t.cameraShoot}
+            </button>
+            <button
+              type="button"
+              className="rounded-full border border-line bg-card px-4 py-2 text-[0.88rem]"
+              onClick={stopCamera}
+            >
+              {t.cameraClose}
+            </button>
+          </div>
+        </div>
+      ) : null}
       {hasImage ? (
         <div className={`relative overflow-hidden rounded-lg border border-line ${collapsed ? "max-h-20" : ""}`}>
         <canvas
