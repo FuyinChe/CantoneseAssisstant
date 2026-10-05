@@ -45,7 +45,8 @@ select {
 }
 
 .stroke-box,
-.practice-box {
+.practice-box,
+.model-box {
   display: block;
   width: var(--box);
   height: var(--box);
@@ -61,10 +62,21 @@ select {
   stroke: #44403c;
 }
 
-.tianzi-line {
-  stroke: #78716c;
-  stroke-width: 1;
-  stroke-dasharray: 4 3;
+.tianzi-mark {
+  fill: #d2c8bb;
+}
+
+.copy-grid {
+  display: flex;
+  flex-wrap: wrap;
+  column-gap: var(--box-gap);
+  row-gap: 6mm;
+}
+
+.copy-pair {
+  display: flex;
+  flex-direction: column;
+  gap: 2.5mm;
 }
 
 .stroke-print {
@@ -86,7 +98,19 @@ select {
 @media print {
   @page {
     size: A4;
-    margin: 12mm;
+    margin: 16mm 12mm 22mm 12mm;
+
+    @top-left {
+      content: var(--print-date, "");
+      font-size: 9pt;
+      color: #6e655c;
+    }
+
+    @top-right {
+      content: "page " counter(page) " of " counter(pages);
+      font-size: 9pt;
+      color: #6e655c;
+    }
   }
 
   body > :not(.stroke-print) {
@@ -103,19 +127,39 @@ select {
   .stroke-print article {
     max-width: none;
     width: 100%;
-    padding: 0;
+    padding: 0 0 8mm;
   }
 
   .stroke-print .no-print {
     display: none !important;
   }
 
+  .sheet-print-footer {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    border-top: 0.4pt solid #e3d8c6;
+    background: #fff;
+    padding-top: 3mm;
+    color: #6e655c;
+  }
+
   .stroke-box,
   .stroke-box path,
   .practice-box,
+  .model-box,
   .practice-frame,
-  .tianzi-line {
+  .tianzi-mark {
     print-color-adjust: exact;
     -webkit-print-color-adjust: exact;
+  }
+
+  .tianzi-mark {
+    fill: #c8bfb4;
+  }
+
+  .copy-pair {
+    break-inside: avoid;
   }
 }

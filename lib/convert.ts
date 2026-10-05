@@ -25,6 +25,12 @@ async function loadRuntime() {
   return { toCn, toHk, toTw, rewriter };
 }
 
+export async function rewriteCantonese(traditional: string) {
+  if (!traditional.trim()) return traditional;
+  const runtime = await loadRuntime();
+  return runtime.rewriter.rewrite(traditional);
+}
+
 export async function convertText(input: string): Promise<Conversion> {
   if (!input.trim()) {
     return { simplified: input, traditional: "", taiwan: "", cantonese: "" };
