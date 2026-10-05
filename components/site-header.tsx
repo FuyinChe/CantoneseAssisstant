@@ -66,12 +66,18 @@ export function SiteHeader() {
         </div>
       </div>
       <div className="pb-2 pt-9">
-        <div className="mb-3 flex items-center gap-3">
-          <span className="inline-flex h-[1.7rem] min-w-[2.6rem] items-center justify-center rounded-full bg-accent px-[0.55rem] text-[0.72rem] font-semibold tracking-[0.06em] text-white">
+        <Link
+          href="/"
+          className="group mb-3 flex w-fit items-center gap-3 no-underline"
+          aria-label={t.brand}
+        >
+          <span className="inline-flex h-[1.7rem] min-w-[2.6rem] items-center justify-center rounded-full bg-accent px-[0.55rem] text-[0.72rem] font-semibold tracking-[0.06em] text-white group-hover:opacity-90">
             CA
           </span>
-          <p className="text-[0.78rem] tracking-[0.14em] text-muted uppercase">{host}</p>
-        </div>
+          <span className="text-[0.78rem] tracking-[0.14em] text-muted uppercase group-hover:text-foreground">
+            {host}
+          </span>
+        </Link>
         <h1 className="font-serif text-[clamp(2rem,5vw,2.7rem)] font-medium tracking-[-0.04em]">{t.brand}</h1>
         {locale === "zh" ? <p className="mt-2 text-muted">{t.enName}</p> : null}
       </div>
