@@ -2,6 +2,7 @@
 
 import { useLayoutEffect, useRef, useState } from "react";
 import { recognizeImage } from "@/lib/ocr";
+import { useLocale } from "@/lib/locale";
 
 type Selection = { x: number; y: number; w: number; h: number };
 
@@ -20,6 +21,7 @@ function DownArrow() {
 }
 
 export function OcrPanel({ onText }: { onText: (text: string) => void }) {
+  const { t } = useLocale();
   const viewRef = useRef<HTMLCanvasElement>(null);
   const imageRef = useRef<HTMLImageElement | null>(null);
   const dragRef = useRef<Selection | null>(null);
@@ -115,7 +117,7 @@ export function OcrPanel({ onText }: { onText: (text: string) => void }) {
     };
     image.onerror = () => {
       URL.revokeObjectURL(url);
-      setError("这张图片读不出来。请换成 JPG 或 PNG 再试。");
+      setError(t.badImage);
       setStatus("");
     };
     image.src = url;
@@ -125,11 +127,11 @@ export function OcrPanel({ onText }: { onText: (text: string) => void }) {
     const image = imageRef.current;
     const view = viewRef.current;
     if (!image || !view) {
-      setError("请先选择一张图片。");
+      setError(t.needImage);
       return;
     }
     if (!selection || selection.w < 8 || selection.h < 8) {
-      setError("先在图片上拖出一个区域。");
+      setError(t.needCrop);
       return;
     }
     const scaleX = image.naturalWidth / view.width;
@@ -156,13 +158,13 @@ export function OcrPanel({ onText }: { onText: (text: string) => void }) {
   return (
     <div className="flex flex-col gap-3">
       <div className="flex flex-wrap gap-2">
-        <label className="relative inline-flex cursor-pointer rounded-full border border-line px-4 py-2 text-sm">
-          拍照或上传
+        <label className="relative inline-flex cursor-pointer items-center rounded-full bg-foreground px-4 py-2 text-[0.88rem] text-background">
+          {t.upload}
           <input
             className="absolute inset-0 cursor-pointer opacity-0"
             type="file"
             accept="image/*"
-            aria-label="拍照或上传图片"
+            aria-label={t.uploadAria}
             onChange={(event) => {
               const file = event.target.files?.[0];
               event.target.value = "";
@@ -172,32 +174,32 @@ export function OcrPanel({ onText }: { onText: (text: string) => void }) {
         </label>
         <button
           type="button"
-          className="rounded-full border border-line px-4 py-2 text-sm"
+          className="rounded-full border border-line bg-card px-4 py-2 text-[0.88rem]"
           onClick={() => {
             const source = fullCanvas();
             if (!source) {
-              setError("请先选择一张图片。");
+              setError(t.needImage);
               return;
             }
             void recognize(source);
           }}
         >
-          识别整张
+          {t.recognizeAll}
         </button>
         <button
           type="button"
-          className="rounded-full border border-line px-4 py-2 text-sm"
+          className="rounded-full border border-line bg-card px-4 py-2 text-[0.88rem]"
           onClick={() => void recognizeSelection()}
         >
-          识别选区
+          {t.recognizeCrop}
         </button>
         {hasImage && !collapsed ? (
           <button
             type="button"
-            className="rounded-full border border-line px-4 py-2 text-sm"
+            className="rounded-full border border-line bg-card px-4 py-2 text-[0.88rem]"
             onClick={() => setCollapsed(true)}
           >
-            隐藏图片
+            {t.hideImage}
           </button>
         ) : null}
       </div>
@@ -236,7 +238,7 @@ export function OcrPanel({ onText }: { onText: (text: string) => void }) {
           <button
             type="button"
             className="absolute inset-0 text-foreground"
-            aria-label="展开图片"
+            aria-label={t.expandImage}
             onClick={() => setCollapsed(false)}
           >
             <span className="absolute inset-x-0 bottom-0 flex h-7 items-center justify-center bg-card/80">
