@@ -45,6 +45,9 @@ export function ReadingLine({
     <div className="flex flex-col gap-2">
       <div className="flex flex-wrap items-start gap-x-3 gap-y-2">
         {tokens.map((token, index) => {
+          if (token.text === "\n" || token.text === "\r") {
+            return <span key={`nl-${index}`} className="h-2 w-full basis-full" aria-hidden="true" />;
+          }
           const reading = overrides[index] ?? token.readings[0] ?? "";
           const choices = token.readings.length > 1;
           const speakable = hanPattern.test(token.text);

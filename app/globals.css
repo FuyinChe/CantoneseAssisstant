@@ -44,6 +44,15 @@ select {
   font-family: inherit;
 }
 
+@keyframes ocr-slide {
+  0% {
+    transform: translateX(-120%);
+  }
+  100% {
+    transform: translateX(320%);
+  }
+}
+
 .stroke-box,
 .practice-box,
 .model-box {

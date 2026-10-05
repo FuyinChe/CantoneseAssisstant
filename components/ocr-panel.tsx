@@ -5,6 +5,13 @@ import { recognizeImage } from "@/lib/ocr";
 import { useLocale } from "@/lib/locale";
 
 type Selection = { x: number; y: number; w: number; h: number };
+type Handle = "n" | "s" | "e" | "w" | "nw" | "ne" | "sw" | "se";
+type Drag =
+  | { kind: "draw"; x: number; y: number }
+  | { kind: "move"; x: number; y: number; orig: Selection }
+  | { kind: "resize"; handle: Handle; orig: Selection };
+
+const handles: Handle[] = ["nw", "n", "ne", "e", "se", "s", "sw", "w"];
 
 function DownArrow() {
   return (
@@ -20,6 +27,77 @@ function DownArrow() {
   );
 }
 
+function clampBox(next: Selection, width: number, height: number): Selection {
+  const w = Math.min(Math.max(8, next.w), width);
+  const h = Math.min(Math.max(8, next.h), height);
+  return {
+    w,
+    h,
+    x: Math.min(Math.max(0, next.x), Math.max(0, width - w)),
+    y: Math.min(Math.max(0, next.y), Math.max(0, height - h)),
+  };
+}
+
+function normalizeBox(x: number, y: number, w: number, h: number, width: number, height: number) {
+  const left = w < 0 ? x + w : x;
+  const top = h < 0 ? y + h : y;
+  return clampBox({ x: left, y: top, w: Math.abs(w), h: Math.abs(h) }, width, height);
+}
+
+function inside(box: Selection, point: { x: number; y: number }, pad = 0) {
+  return (
+    point.x >= box.x - pad &&
+    point.x <= box.x + box.w + pad &&
+    point.y >= box.y - pad &&
+    point.y <= box.y + box.h + pad
+  );
+}
+
+function handlePoint(box: Selection, handle: Handle) {
+  const mx = box.x + box.w / 2;
+  const my = box.y + box.h / 2;
+  if (handle === "nw") return { x: box.x, y: box.y };
+  if (handle === "n") return { x: mx, y: box.y };
+  if (handle === "ne") return { x: box.x + box.w, y: box.y };
+  if (handle === "e") return { x: box.x + box.w, y: my };
+  if (handle === "se") return { x: box.x + box.w, y: box.y + box.h };
+  if (handle === "s") return { x: mx, y: box.y + box.h };
+  if (handle === "sw") return { x: box.x, y: box.y + box.h };
+  return { x: box.x, y: my };
+}
+
+function hitHandle(box: Selection, point: { x: number; y: number }, slop: number): Handle | null {
+  for (const handle of handles) {
+    const spot = handlePoint(box, handle);
+    if (Math.abs(spot.x - point.x) <= slop && Math.abs(spot.y - point.y) <= slop) return handle;
+  }
+  return null;
+}
+
+function resizeBox(orig: Selection, handle: Handle, point: { x: number; y: number }, width: number, height: number) {
+  let { x, y, w, h } = orig;
+  if (handle.includes("w")) {
+    w = orig.x + orig.w - point.x;
+    x = point.x;
+  }
+  if (handle.includes("e")) w = point.x - orig.x;
+  if (handle.includes("n")) {
+    h = orig.y + orig.h - point.y;
+    y = point.y;
+  }
+  if (handle.includes("s")) h = point.y - orig.y;
+  return normalizeBox(x, y, w, h, width, height);
+}
+
+function cursorFor(handle: Handle | null, moving: boolean) {
+  if (handle === "n" || handle === "s") return "ns-resize";
+  if (handle === "e" || handle === "w") return "ew-resize";
+  if (handle === "nw" || handle === "se") return "nwse-resize";
+  if (handle === "ne" || handle === "sw") return "nesw-resize";
+  if (moving) return "move";
+  return "crosshair";
+}
+
 export function OcrPanel({ onText }: { onText: (text: string) => void }) {
   const { t } = useLocale();
   const viewRef = useRef<HTMLCanvasElement>(null);
@@ -27,7 +105,7 @@ export function OcrPanel({ onText }: { onText: (text: string) => void }) {
   const streamRef = useRef<MediaStream | null>(null);
   const cameraInputRef = useRef<HTMLInputElement>(null);
   const imageRef = useRef<HTMLImageElement | null>(null);
-  const dragRef = useRef<Selection | null>(null);
+  const dragRef = useRef<Drag | null>(null);
   const [cameraOpen, setCameraOpen] = useState(false);
   const [selection, setSelection] = useState<Selection | null>(null);
   const [hasImage, setHasImage] = useState(false);
@@ -35,6 +113,20 @@ export function OcrPanel({ onText }: { onText: (text: string) => void }) {
   const [collapsed, setCollapsed] = useState(false);
   const [status, setStatus] = useState("");
   const [error, setError] = useState("");
+  const [busy, setBusy] = useState(false);
+  const [progress, setProgress] = useState(0);
+
+  function canvasSlop() {
+    const view = viewRef.current;
+    if (!view) return 14;
+    const bounds = view.getBoundingClientRect();
+    const scale = bounds.width > 0 ? view.width / bounds.width : 1;
+    return Math.max(12, 12 * scale);
+  }
+
+  function handleSize() {
+    return Math.max(8, canvasSlop() * 0.7);
+  }
 
   function paint(next: Selection | null) {
     const view = viewRef.current;
@@ -47,10 +139,16 @@ export function OcrPanel({ onText }: { onText: (text: string) => void }) {
     if (!next || next.w < 4 || next.h < 4) return;
     context.save();
     context.strokeStyle = "#9c3b2e";
-    context.lineWidth = 2;
+    context.lineWidth = Math.max(2, handleSize() / 4);
     context.strokeRect(next.x, next.y, next.w, next.h);
     context.fillStyle = "rgba(156, 59, 46, 0.18)";
     context.fillRect(next.x, next.y, next.w, next.h);
+    const size = handleSize();
+    context.fillStyle = "#9c3b2e";
+    for (const handle of handles) {
+      const spot = handlePoint(next, handle);
+      context.fillRect(spot.x - size / 2, spot.y - size / 2, size, size);
+    }
     context.restore();
   }
 
@@ -58,7 +156,7 @@ export function OcrPanel({ onText }: { onText: (text: string) => void }) {
     paint(selection);
   });
 
-  function pointFromEvent(event: React.PointerEvent<HTMLCanvasElement>) {
+  function pointFromEvent(event: { clientX: number; clientY: number }) {
     const canvas = viewRef.current;
     if (!canvas) return { x: 0, y: 0 };
     const bounds = canvas.getBoundingClientRect();
@@ -80,30 +178,51 @@ export function OcrPanel({ onText }: { onText: (text: string) => void }) {
     return canvas;
   }
 
+  function ocrPhase(raw: string) {
+    const status = raw.toLowerCase();
+    if (status.includes("language")) return t.ocrLoadingLang;
+    if (status.includes("loading tesseract") || status.includes("loaded tesseract") || status.includes("core")) {
+      return t.ocrPreparing;
+    }
+    if (status.includes("initializ")) return t.ocrInit;
+    if (status.includes("recogniz")) return t.ocrReading;
+    return t.ocrBusy;
+  }
+
   async function recognize(target: HTMLCanvasElement) {
     setError("");
-    setStatus("正在下载识别语言包…");
+    setBusy(true);
+    setProgress(0);
+    setCollapsed(false);
+    setStatus(t.ocrPreparing);
     try {
       const text = await recognizeImage(target, (update) => {
-        const percent = Math.round(update.progress * 100);
-        setStatus(`${update.status} ${percent}%`);
+        setProgress(Math.max(0, Math.min(100, Math.round(update.progress * 100))));
+        setStatus(ocrPhase(update.status));
       });
       if (!text) {
-        setError("没有识别到文字。可以框选文字更集中的区域再试。");
+        setError(t.ocrEmpty);
         setStatus("");
         return;
       }
       onText(text);
       setCollapsed(true);
-      setStatus("识别完成，已填入上方文字。图片只留在这台浏览器里。");
+      setStatus(t.ocrDone);
     } catch (reason) {
-      setError(reason instanceof Error ? reason.message : "识别失败。");
+      setError(reason instanceof Error ? reason.message : t.ocrFail);
       setStatus("");
+    } finally {
+      setBusy(false);
+      setProgress(0);
     }
   }
 
   function loadFile(file: File) {
     stopCamera();
+    setError("");
+    setStatus(t.ocrOpening);
+    setBusy(true);
+    setProgress(0);
     const url = URL.createObjectURL(file);
     const image = new Image();
     image.onload = () => {
@@ -116,12 +235,13 @@ export function OcrPanel({ onText }: { onText: (text: string) => void }) {
       setSelection(null);
       setHasImage(true);
       setCollapsed(false);
-      setError("");
-      setStatus("按住图片拖动，框出要识别的字，再按识别选区。");
+      setBusy(false);
+      setStatus(t.ocrHint);
       URL.revokeObjectURL(url);
     };
     image.onerror = () => {
       URL.revokeObjectURL(url);
+      setBusy(false);
       setError(t.badImage);
       setStatus("");
     };
@@ -155,6 +275,7 @@ export function OcrPanel({ onText }: { onText: (text: string) => void }) {
   }
 
   async function startCamera() {
+    if (busy) return;
     setError("");
     setStatus("");
     const nativeCapture = () => cameraInputRef.current?.click();
@@ -249,24 +370,40 @@ export function OcrPanel({ onText }: { onText: (text: string) => void }) {
     await recognize(crop);
   }
 
+  function updateCursor(point: { x: number; y: number }) {
+    const view = viewRef.current;
+    if (!view) return;
+    if (!selection) {
+      view.style.cursor = "crosshair";
+      return;
+    }
+    const handle = hitHandle(selection, point, canvasSlop());
+    view.style.cursor = cursorFor(handle, inside(selection, point));
+  }
+
+  const waiting = busy;
+  const showProgress = waiting || Boolean(status);
+
   return (
     <div className="flex flex-col gap-3">
       <div className="relative flex flex-wrap gap-2">
         <button
           type="button"
-          className="rounded-full bg-foreground px-4 py-2 text-[0.88rem] text-background"
+          className="rounded-full bg-foreground px-4 py-2 text-[0.88rem] text-background disabled:opacity-40"
           aria-label={t.cameraAria}
+          disabled={waiting}
           onClick={() => void startCamera()}
         >
           {t.camera}
         </button>
-        <label className="relative inline-flex cursor-pointer items-center rounded-full border border-line bg-card px-4 py-2 text-[0.88rem]">
+        <label className={`relative inline-flex items-center rounded-full border border-line bg-card px-4 py-2 text-[0.88rem] ${waiting ? "pointer-events-none opacity-40" : "cursor-pointer"}`}>
           {t.upload}
           <input
             className="absolute inset-0 cursor-pointer opacity-0"
             type="file"
             accept="image/*"
             aria-label={t.uploadAria}
+            disabled={waiting}
             onChange={(event) => {
               const file = event.target.files?.[0];
               event.target.value = "";
@@ -290,7 +427,8 @@ export function OcrPanel({ onText }: { onText: (text: string) => void }) {
         />
         <button
           type="button"
-          className="rounded-full border border-line bg-card px-4 py-2 text-[0.88rem]"
+          className="rounded-full border border-line bg-card px-4 py-2 text-[0.88rem] disabled:opacity-40"
+          disabled={waiting}
           onClick={() => {
             const source = fullCanvas();
             if (!source) {
@@ -304,7 +442,8 @@ export function OcrPanel({ onText }: { onText: (text: string) => void }) {
         </button>
         <button
           type="button"
-          className="rounded-full border border-line bg-card px-4 py-2 text-[0.88rem]"
+          className="rounded-full border border-line bg-card px-4 py-2 text-[0.88rem] disabled:opacity-40"
+          disabled={waiting}
           onClick={() => void recognizeSelection()}
         >
           {t.recognizeCrop}
@@ -312,7 +451,8 @@ export function OcrPanel({ onText }: { onText: (text: string) => void }) {
         {hasImage && !collapsed ? (
           <button
             type="button"
-            className="rounded-full border border-line bg-card px-4 py-2 text-[0.88rem]"
+            className="rounded-full border border-line bg-card px-4 py-2 text-[0.88rem] disabled:opacity-40"
+            disabled={waiting}
             onClick={() => setCollapsed(true)}
           >
             {t.hideImage}
@@ -348,51 +488,112 @@ export function OcrPanel({ onText }: { onText: (text: string) => void }) {
         </div>
       ) : null}
       {hasImage ? (
-        <div className={`relative overflow-hidden rounded-lg border border-line ${collapsed ? "max-h-20" : ""}`}>
-        <canvas
-          ref={viewRef}
-          width={preview.width}
-          height={preview.height}
-          className={`max-w-full touch-none ${collapsed ? "pointer-events-none" : ""}`}
-          aria-label="待识别图片，可拖选文字区域"
-          onPointerDown={(event) => {
-            const start = pointFromEvent(event);
-            dragRef.current = { ...start, w: 0, h: 0 };
-            event.currentTarget.setPointerCapture(event.pointerId);
-          }}
-          onPointerMove={(event) => {
-            const drag = dragRef.current;
-            if (!drag) return;
-            const current = pointFromEvent(event);
-            setSelection({
-              x: Math.min(drag.x, current.x),
-              y: Math.min(drag.y, current.y),
-              w: Math.abs(current.x - drag.x),
-              h: Math.abs(current.y - drag.y),
-            });
-          }}
-          onPointerUp={() => {
-            dragRef.current = null;
-          }}
-          onPointerCancel={() => {
-            dragRef.current = null;
-          }}
-        />
-        {collapsed ? (
-          <button
-            type="button"
-            className="absolute inset-0 text-foreground"
-            aria-label={t.expandImage}
-            onClick={() => setCollapsed(false)}
-          >
-            <span className="absolute inset-x-0 bottom-0 flex h-7 items-center justify-center bg-card/80">
-              <DownArrow />
-            </span>
-          </button>
-        ) : null}
+        <div className={`relative overflow-hidden rounded-lg border border-line ${collapsed && !waiting ? "max-h-20" : ""}`}>
+          <canvas
+            ref={viewRef}
+            width={preview.width}
+            height={preview.height}
+            className={`max-w-full touch-none ${collapsed && !waiting ? "pointer-events-none" : ""}`}
+            aria-label={t.ocrHint}
+            onPointerDown={(event) => {
+              if (waiting) return;
+              const view = event.currentTarget;
+              const start = pointFromEvent(event);
+              const slop = canvasSlop();
+              if (selection) {
+                const handle = hitHandle(selection, start, slop);
+                if (handle) {
+                  dragRef.current = { kind: "resize", handle, orig: selection };
+                } else if (inside(selection, start)) {
+                  dragRef.current = { kind: "move", x: start.x, y: start.y, orig: selection };
+                } else {
+                  dragRef.current = { kind: "draw", x: start.x, y: start.y };
+                }
+              } else {
+                dragRef.current = { kind: "draw", x: start.x, y: start.y };
+              }
+              view.setPointerCapture(event.pointerId);
+            }}
+            onPointerMove={(event) => {
+              const point = pointFromEvent(event);
+              const drag = dragRef.current;
+              const view = viewRef.current;
+              if (!drag) {
+                updateCursor(point);
+                return;
+              }
+              if (!view) return;
+              if (drag.kind === "draw") {
+                view.style.cursor = "crosshair";
+                setSelection(normalizeBox(drag.x, drag.y, point.x - drag.x, point.y - drag.y, view.width, view.height));
+                return;
+              }
+              if (drag.kind === "move") {
+                view.style.cursor = "move";
+                setSelection(
+                  clampBox(
+                    {
+                      ...drag.orig,
+                      x: drag.orig.x + (point.x - drag.x),
+                      y: drag.orig.y + (point.y - drag.y),
+                    },
+                    view.width,
+                    view.height,
+                  ),
+                );
+                return;
+              }
+              view.style.cursor = cursorFor(drag.handle, false);
+              setSelection(resizeBox(drag.orig, drag.handle, point, view.width, view.height));
+            }}
+            onPointerUp={() => {
+              dragRef.current = null;
+            }}
+            onPointerCancel={() => {
+              dragRef.current = null;
+            }}
+            onDoubleClick={(event) => {
+              if (waiting) return;
+              const point = pointFromEvent(event);
+              if (!selection || selection.w < 8 || selection.h < 8) return;
+              if (!inside(selection, point, canvasSlop())) return;
+              dragRef.current = null;
+              void recognizeSelection();
+            }}
+          />
+          {waiting ? (
+            <div className="absolute inset-0 flex flex-col items-center justify-center gap-3 bg-card/80 px-4" role="status" aria-live="polite">
+              <span className="h-8 w-8 animate-spin rounded-full border-2 border-line border-t-accent" aria-hidden="true" />
+              <p className="text-center text-sm text-foreground">{status || t.ocrBusy}</p>
+              <div className="h-1.5 w-[min(16rem,70%)] overflow-hidden rounded-full bg-line">
+                {progress > 0 ? (
+                  <div className="h-full bg-accent" style={{ width: `${progress}%` }} />
+                ) : (
+                  <div className="h-full w-1/3 bg-accent" style={{ animation: "ocr-slide 1.1s ease-in-out infinite" }} />
+                )}
+              </div>
+            </div>
+          ) : null}
+          {collapsed && !waiting ? (
+            <button
+              type="button"
+              className="absolute inset-0 text-foreground"
+              aria-label={t.expandImage}
+              onClick={() => setCollapsed(false)}
+            >
+              <span className="absolute inset-x-0 bottom-0 flex h-7 items-center justify-center bg-card/80">
+                <DownArrow />
+              </span>
+            </button>
+          ) : null}
+        </div>
+      ) : waiting ? (
+        <div className="flex flex-col items-center justify-center gap-3 rounded-lg border border-line bg-card px-4 py-8" role="status" aria-live="polite">
+          <span className="h-8 w-8 animate-spin rounded-full border-2 border-line border-t-accent" aria-hidden="true" />
+          <p className="text-sm text-foreground">{status || t.ocrOpening}</p>
         </div>
       ) : null}
-      {status ? <p className="text-sm text-muted">{status}</p> : null}
+      {showProgress && !waiting ? <p className="text-sm text-muted">{status}</p> : null}
       {error ? <p className="text-sm text-accent">{error}</p> : null}
     </div>
   );
