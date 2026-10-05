@@ -21,7 +21,7 @@ export function PlayButton({
     <div className="flex flex-col items-start gap-1">
       <button
         type="button"
-        className="inline-flex h-10 w-10 items-center justify-center rounded-full bg-accent text-white disabled:opacity-40"
+        className="inline-flex h-10 w-10 items-center justify-center rounded-full bg-foreground text-background disabled:opacity-40"
         aria-label={label}
         title={label}
         disabled={!text.trim()}

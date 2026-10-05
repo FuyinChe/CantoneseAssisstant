@@ -10,6 +10,7 @@ import { PlayButton } from "@/components/play-button";
 import { StrokeSheet } from "@/components/stroke-sheet";
 import { convertText } from "@/lib/convert";
 import { glyphMarks } from "@/lib/glyphs";
+import { useLocale } from "@/lib/locale";
 import type { Conversion } from "@/lib/types";
 
 const empty: Conversion = { simplified: "", traditional: "", taiwan: "", cantonese: "" };
@@ -35,6 +36,7 @@ function GlyphText({ text, marks }: { text: string; marks: boolean[] }) {
 }
 
 function GlyphComparison({ result }: { result: Conversion }) {
+  const { t } = useLocale();
   const [hongKongMarks = [], taiwanMarks = [], simplifiedMarks = []] = glyphMarks([
     result.traditional,
     result.taiwan,
@@ -42,23 +44,21 @@ function GlyphComparison({ result }: { result: Conversion }) {
   ]);
 
   return (
-    <article className="overflow-hidden rounded-2xl border border-line bg-card">
-      <div className="border-b border-line bg-background px-4 py-3">
-        <h2 className="text-sm font-semibold">字形</h2>
-        <p className="mt-1 text-xs text-muted">香港繁体、台湾繁体、简体并排。同一位置用字不同的字会标出来。</p>
-      </div>
-      <div className="flex flex-col divide-y divide-line px-4">
-        <div className="flex flex-col gap-3 py-5">
-          <div className="flex items-center justify-between gap-3">
-            <h3 className="text-sm font-semibold">香港繁体</h3>
+    <section className="border-t border-line py-8">
+      <h2 className="mb-3 font-serif text-[1.35rem] font-medium">{t.glyphs}</h2>
+      <p className="text-muted">{t.glyphsHint}</p>
+      <div className="mt-6 flex flex-col gap-8">
+        <div className="flex flex-col gap-3">
+          <div className="flex flex-wrap items-center justify-between gap-3">
+            <h3 className="text-lg font-medium">{t.hongKong}</h3>
             <StrokeSheet text={result.traditional} />
           </div>
-          <p className="text-xs text-muted">只改香港用字，口头说法不变。后面会变成後面。可以打印成带笔顺的工作纸。</p>
+          <p className="text-muted">{t.hongKongHint}</p>
           <GlyphText text={result.traditional} marks={hongKongMarks} />
         </div>
-        <div className="flex flex-col gap-3 py-5">
-          <h3 className="text-sm font-semibold">台湾繁体</h3>
-          <p className="text-xs text-muted">只改台湾用字。里写成裡，台写成臺。点字听国语，多音字点注音可以改读音。</p>
+        <div className="flex flex-col gap-3 border-t border-line pt-8">
+          <h3 className="text-lg font-medium">{t.taiwan}</h3>
+          <p className="text-muted">{t.taiwanHint}</p>
           {result.taiwan ? (
             <ZhuyinLine
               key={result.taiwan}
@@ -69,24 +69,25 @@ function GlyphComparison({ result }: { result: Conversion }) {
           ) : (
             <p className="min-h-16 text-lg">…</p>
           )}
-          <PlayButton text={result.taiwan} lang="zh-TW" label="国语习惯" />
+          <PlayButton text={result.taiwan} lang="zh-TW" label={t.playTaiwan} />
         </div>
-        <div className="flex flex-col gap-3 py-5">
-          <h3 className="text-sm font-semibold">简体</h3>
-          <p className="text-xs text-muted">点字听普通话。多音字点下面的拼音可以改读音。</p>
+        <div className="flex flex-col gap-3 border-t border-line pt-8">
+          <h3 className="text-lg font-medium">{t.simplified}</h3>
+          <p className="text-muted">{t.simplifiedHint}</p>
           {result.simplified ? (
             <PinyinLine key={result.simplified} text={result.simplified} marks={simplifiedMarks} />
           ) : (
             <p className="min-h-16 text-lg">…</p>
           )}
-          <PlayButton text={result.simplified} lang="zh-CN" label="普通话习惯" />
+          <PlayButton text={result.simplified} lang="zh-CN" label={t.playMandarin} />
         </div>
       </div>
-    </article>
+    </section>
   );
 }
 
 export function Workspace() {
+  const { t } = useLocale();
   const [input, setInput] = useState("我不知道后面怎么走。");
   const [result, setResult] = useState<Conversion>(empty);
 
@@ -101,42 +102,33 @@ export function Workspace() {
   }, [input]);
 
   return (
-    <div className="mx-auto flex w-full max-w-5xl flex-col gap-6 px-4 py-6">
-      <section className="overflow-hidden rounded-2xl border border-line bg-card">
-        <div className="border-b border-line bg-background px-4 py-3">
-          <label className="text-sm font-semibold" htmlFor="source-text">
-            输入
-          </label>
-          <p className="mt-1 text-xs text-muted">
-            直接输入，或拍照、上传图片后识别整张或拖选一块。简体、繁体都可以。图片不会上传。
-          </p>
-        </div>
-        <div className="flex flex-col gap-3 p-4">
-          <textarea
-            id="source-text"
-            className="min-h-32 rounded-xl border border-line bg-background p-4 text-lg outline-none focus:border-accent"
-            value={input}
-            onChange={(event) => setInput(event.target.value)}
-            placeholder="简体或繁体都可以，例如：我不知道后面怎么走。"
-          />
+    <div className="mx-auto w-[min(880px,calc(100%-32px))]">
+      <section className="border-t border-line py-8">
+        <h2 id="input-heading" className="mb-3 font-serif text-[1.35rem] font-medium">{t.input}</h2>
+        <p className="max-w-[40rem] text-muted">{t.inputHint}</p>
+        <textarea
+          id="source-text"
+          aria-labelledby="input-heading"
+          className="mt-5 min-h-32 w-full rounded-2xl border border-line bg-card p-4 text-lg outline-none focus:border-foreground"
+          value={input}
+          onChange={(event) => setInput(event.target.value)}
+          placeholder={t.inputPlaceholder}
+        />
+        <div className="mt-4">
           <OcrPanel onText={setInput} />
         </div>
       </section>
 
-      <section className="flex flex-col gap-4">
-        <article className="overflow-hidden rounded-2xl border border-line bg-card">
-          <div className="border-b border-line bg-background px-4 py-3">
-            <h2 className="text-sm font-semibold">粤语表达</h2>
-            <p className="mt-1 text-xs text-muted">点字听粤语。多音字点下面的粤拼可以改读音。</p>
-          </div>
-          <div className="flex flex-col gap-3 p-4">
-            <JyutpingLine key={result.cantonese} text={result.cantonese} />
-            <PlayButton text={result.cantonese} lang="zh-HK" label="粤语习惯" />
-          </div>
-        </article>
-        <GlyphComparison result={result} />
-        <EnglishCard source={result.simplified} />
+      <section className="border-t border-line py-8">
+        <h2 className="mb-3 font-serif text-[1.35rem] font-medium">{t.cantonese}</h2>
+        <p className="mb-5 text-muted">{t.cantoneseHint}</p>
+        <JyutpingLine key={result.cantonese} text={result.cantonese} />
+        <div className="mt-4">
+          <PlayButton text={result.cantonese} lang="zh-HK" label={t.playCantonese} />
+        </div>
       </section>
+      <GlyphComparison result={result} />
+      <EnglishCard source={result.simplified} />
     </div>
   );
 }

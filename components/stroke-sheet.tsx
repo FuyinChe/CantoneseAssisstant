@@ -5,6 +5,7 @@ import { createPortal } from "react-dom";
 import type { SheetBoxSize } from "@/lib/stroke-pdf";
 import { siteName, siteNameEn, siteUrl } from "@/lib/site";
 import { loadStrokes } from "@/lib/strokes";
+import { useLocale } from "@/lib/locale";
 
 const hanPattern = /\p{Script=Han}/u;
 const PRACTICE_BOXES = 5;
@@ -42,6 +43,7 @@ function StrokeGlyph({
 }
 
 export function StrokeSheet({ text }: { text: string }) {
+  const { t } = useLocale();
   const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
@@ -118,7 +120,7 @@ export function StrokeSheet({ text }: { text: string }) {
       disabled={shown.length === 0}
       onClick={() => void openSheet()}
     >
-      打印工作纸
+      {t.printSheet}
     </button>
   );
 

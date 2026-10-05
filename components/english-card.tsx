@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { PlayButton } from "@/components/play-button";
+import { useLocale } from "@/lib/locale";
 
 type Translation = {
   source: string;
@@ -10,6 +11,7 @@ type Translation = {
 };
 
 export function EnglishCard({ source }: { source: string }) {
+  const { t } = useLocale();
   const [translation, setTranslation] = useState<Translation>({ source: "", text: "", error: "" });
   const current = source.trim();
   const matched = translation.source === current ? translation : null;
@@ -50,16 +52,14 @@ export function EnglishCard({ source }: { source: string }) {
   const pending = Boolean(current) && !matched;
 
   return (
-    <article className="overflow-hidden rounded-2xl border border-line bg-card">
-      <div className="border-b border-line bg-background px-4 py-3">
-        <h2 className="text-sm font-semibold">英文</h2>
-        <p className="mt-1 text-xs text-muted">按简体意思做机器翻译。句子会送到在线翻译服务。</p>
+    <section className="border-t border-line py-8">
+      <h2 className="mb-3 font-serif text-[1.35rem] font-medium">{t.english}</h2>
+      <p className="mb-5 text-muted">{t.englishHint}</p>
+      <p className="min-h-16 text-lg">{text || (pending ? t.translating : "…")}</p>
+      {error ? <p className="text-sm text-accent">{error}</p> : null}
+      <div className="mt-4">
+        <PlayButton text={text} lang="en-US" label={t.playEnglish} />
       </div>
-      <div className="flex flex-col gap-3 p-4">
-        <p className="min-h-16 text-lg">{text || (pending ? "翻译中…" : "…")}</p>
-        {error ? <p className="text-sm text-accent">{error}</p> : null}
-        <PlayButton text={text} lang="en-US" label="英文朗读" />
-      </div>
-    </article>
+    </section>
   );
 }

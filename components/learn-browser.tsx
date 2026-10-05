@@ -3,28 +3,31 @@
 import { useMemo, useState } from "react";
 import { JyutpingLine } from "@/components/jyutping-line";
 import { PlayButton } from "@/components/play-button";
-import { bundledExamples, categoryLabel, EXAMPLE_CATEGORIES } from "@/lib/examples";
+import { bundledExamples, EXAMPLE_CATEGORIES } from "@/lib/examples";
+import { useLocale } from "@/lib/locale";
 import type { ExampleCategory } from "@/lib/types";
 
 const PAGE_SIZE = 20;
 
 export function LearnBrowser() {
+  const { t } = useLocale();
   const [query, setQuery] = useState("");
   const [category, setCategory] = useState<ExampleCategory | "all">("all");
   const [page, setPage] = useState(0);
   const examples = useMemo(() => bundledExamples(), []);
+  const labelFor = (id: ExampleCategory | undefined) => (id ? t.categories[id] : t.other);
 
   const filtered = useMemo(() => {
     const needle = query.trim().toLowerCase();
     return examples.filter((example) => {
       if (category !== "all" && example.category !== category) return false;
       if (!needle) return true;
-      return [example.cantonese, example.simplified, example.traditional, example.jyutping, example.mandarinGloss, categoryLabel(example.category)]
+      return [example.cantonese, example.simplified, example.traditional, example.jyutping, example.mandarinGloss, labelFor(example.category)]
         .join("\n")
         .toLowerCase()
         .includes(needle);
     });
-  }, [category, examples, query]);
+  }, [category, examples, query, t]);
 
   const pageCount = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE));
   const currentPage = Math.min(page, pageCount - 1);
@@ -33,33 +36,33 @@ export function LearnBrowser() {
   const groups = useMemo(() => {
     const next: { id: string; label: string; examples: typeof visible }[] = [];
     for (const example of visible) {
-      const label = categoryLabel(example.category);
+      const label = labelFor(example.category);
       const last = next.at(-1);
       if (last?.label === label) last.examples.push(example);
       else next.push({ id: `${example.category ?? "other"}-${example.id}`, label, examples: [example] });
     }
     return next;
-  }, [visible]);
+  }, [visible, t]);
 
   return (
-    <div className="mx-auto flex w-full max-w-5xl flex-col gap-6 px-4 py-6">
-      <section className="flex flex-col gap-3">
-        <h1 className="text-2xl font-semibold">日常粤语短句</h1>
-        <p className="text-sm text-muted">按场景看短句。点字可以听粤语，共 {examples.length} 句。</p>
-        <label className="text-sm" htmlFor="example-search">
-          搜索
+    <div className="mx-auto w-[min(880px,calc(100%-32px))]">
+      <section className="border-t border-line py-8">
+        <h2 className="mb-3 font-serif text-[1.35rem] font-medium">{t.phrasesTitle}</h2>
+        <p className="text-muted">{t.phrasesHint(examples.length)}</p>
+        <label className="mt-5 block text-sm" htmlFor="example-search">
+          {t.search}
           <input
             id="example-search"
-            className="mt-1 w-full rounded-xl border border-line bg-card px-3 py-2"
+            className="mt-1 w-full rounded-2xl border border-line bg-card px-4 py-3 outline-none focus:border-foreground"
             value={query}
             onChange={(event) => {
               setQuery(event.target.value);
               setPage(0);
             }}
-            placeholder="粤语或简体意思"
+            placeholder={t.searchPlaceholder}
           />
         </label>
-        <div className="flex flex-wrap gap-2" role="group" aria-label="场景">
+        <div className="mt-4 flex flex-wrap gap-2" role="group" aria-label={t.scenes}>
           <button
             type="button"
             className={chipClass(category === "all")}
@@ -69,7 +72,7 @@ export function LearnBrowser() {
               setPage(0);
             }}
           >
-            全部
+            {t.all}
           </button>
           {EXAMPLE_CATEGORIES.map((item) => (
             <button
@@ -82,55 +85,53 @@ export function LearnBrowser() {
                 setPage(0);
               }}
             >
-              {item.label}
+              {t.categories[item.id]}
             </button>
           ))}
         </div>
       </section>
 
-      {groups.length === 0 ? <p className="text-sm text-muted">没有找到这样的短句。</p> : null}
+      {groups.length === 0 ? <p className="text-sm text-muted">{t.none}</p> : null}
 
       {filtered.length > 0 ? (
         <div className="flex flex-wrap items-center justify-between gap-3 text-sm text-muted">
-          <p>
-            找到 {filtered.length} 句，本页 {pageStart + 1}–{pageStart + visible.length}
-          </p>
+          <p>{t.found(filtered.length, pageStart + 1, pageStart + visible.length)}</p>
           <div className="flex gap-2">
             <button
               type="button"
-              className="rounded-full border border-line bg-card px-3 py-1 disabled:opacity-40"
+              className="rounded-full border border-line bg-card px-4 py-2 text-[0.88rem] disabled:opacity-40"
               disabled={currentPage === 0}
               onClick={() => setPage(currentPage - 1)}
             >
-              上一页
+              {t.prev}
             </button>
             <span className="self-center">
               {currentPage + 1} / {pageCount}
             </span>
             <button
               type="button"
-              className="rounded-full border border-line bg-card px-3 py-1 disabled:opacity-40"
+              className="rounded-full border border-line bg-card px-4 py-2 text-[0.88rem] disabled:opacity-40"
               disabled={currentPage >= pageCount - 1}
               onClick={() => setPage(currentPage + 1)}
             >
-              下一页
+              {t.next}
             </button>
           </div>
         </div>
       ) : null}
 
       {groups.map((group) => (
-        <section key={group.id} className="flex flex-col gap-3">
-          <h2 className="text-sm font-semibold">{group.label}</h2>
-          <ul className="flex flex-col gap-3">
+        <section key={group.id} className="border-t border-line py-8">
+          <h2 className="mb-3 font-serif text-[1.35rem] font-medium">{group.label}</h2>
+          <ul className="flex flex-col">
             {group.examples.map((example) => (
-              <li key={example.id} className="rounded-2xl border border-line bg-card p-4">
+              <li key={example.id} className="border-t border-line py-5 first:border-t-0 first:pt-0">
                 <div className="flex flex-wrap items-start justify-between gap-3">
                   <div>
                     <JyutpingLine key={example.cantonese} text={example.cantonese} />
                     <p className="mt-2 text-sm">{example.mandarinGloss}</p>
                   </div>
-                  <PlayButton text={example.cantonese} lang="zh-HK" label="粤语" />
+                  <PlayButton text={example.cantonese} lang="zh-HK" label={t.playPhrase} />
                 </div>
               </li>
             ))}
@@ -143,6 +144,6 @@ export function LearnBrowser() {
 
 function chipClass(selected: boolean) {
   return selected
-    ? "rounded-full bg-accent px-3 py-1 text-sm text-white"
-    : "rounded-full border border-line bg-card px-3 py-1 text-sm";
+    ? "rounded-full bg-foreground px-4 py-2 text-[0.88rem] text-background"
+    : "rounded-full border border-line bg-card px-4 py-2 text-[0.88rem]";
 }
