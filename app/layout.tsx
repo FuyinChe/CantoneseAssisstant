@@ -19,7 +19,7 @@ const sans = Source_Sans_3({
 
 export const metadata: Metadata = {
   title: "粤语助手",
-  description: "简体或繁体输入会给出拼音、英文翻译、台湾繁体注音、香港字形和粤语表达，并用普通话、英语、国语与粤语语音播放。",
+  description: "简体或繁体输入会给出拼音、英文翻译、台湾繁体注音、香港字形和粤语口语，并用普通话、英语、国语与粤语语音播放。香港繁体标书面语粤拼，整句按粤语读书面语。",
 };
 
 export default function RootLayout({ children }: { children: ReactNode }) {

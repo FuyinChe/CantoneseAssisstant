@@ -47,10 +47,11 @@ function GlyphComparison({
             simplified={result.simplified}
             marks={hongKongMarks}
             lang="zh-HK"
-            speakLabel={t.playCantonese}
+            speakLabel={t.playWritten}
             chooseLabel={t.variantPick}
             onChange={onTraditional}
           />
+          <PlayButton text={result.traditional} lang="zh-HK" label={t.playWritten} caption={t.playWritten} />
         </div>
         <div className="flex flex-col gap-3 border-t border-line pt-8">
           <h3 className="text-lg font-medium">{t.taiwan}</h3>
