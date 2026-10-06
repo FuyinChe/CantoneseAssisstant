@@ -14,7 +14,7 @@ let onProgress: ((progress: OcrProgress) => void) | null = null;
 
 async function getWorker() {
   if (!workerPromise) {
-    workerPromise = import("tesseract.js").then(async ({ createWorker }) => {
+    workerPromise = import("tesseract.js").then(async ({ createWorker, PSM }) => {
       // Traditional first — HK/TW textbooks; simplified still available as fallback glyphs.
       const worker = await createWorker("chi_tra+chi_sim", 1, {
         workerPath: "https://cdn.jsdelivr.net/npm/tesseract.js@7.0.0/dist/worker.min.js",
@@ -26,7 +26,7 @@ async function getWorker() {
         },
       });
       await worker.setParameters({
-        tessedit_pageseg_mode: "6",
+        tessedit_pageseg_mode: PSM.SINGLE_BLOCK,
         preserve_interword_spaces: "1",
       });
       return worker;
