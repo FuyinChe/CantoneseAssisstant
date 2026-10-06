@@ -9,13 +9,15 @@ export function PlayButton({
   text,
   lang,
   label,
+  caption,
 }: {
   text: string;
   lang: SpeechLang;
   label: string;
+  caption?: string;
 }) {
   const [error, setError] = useState("");
-  const voiceLabel = neuralVoices[lang].label;
+  const voiceLabel = caption ?? neuralVoices[lang].label;
 
   return (
     <div className="flex flex-col items-start gap-1">

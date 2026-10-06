@@ -246,16 +246,29 @@ export function linesFromBoxes(items: OcrBox[], minScore = 0.32) {
   const unit = median(rows.map((row) => row.height)) || hanHeight || 32;
   const zhuyin = zhuyinRuby(rows);
   if (zhuyin.isPage) return linesFromZhuyinPage(rows, zhuyin.ruby, unit);
-  const { spacing, known } = stackedSpacing(rows, unit);
+  const body = withoutLeftMargin(rows, unit);
+  const { spacing, known } = stackedSpacing(body, unit);
   const limit = known ? Math.max(10, spacing * 0.34) : Math.max(10, unit * 0.72);
 
   return joinRaisedRights(
-    absorbScraps(peelRaisedLefts(clusterByBaseline(rows, limit), unit), spacing, unit),
+    absorbScraps(peelRaisedLefts(clusterByBaseline(body, limit), unit), spacing, unit),
     spacing,
     unit,
   )
     .map(joinParts)
     .join("\n");
+}
+
+/** A short note in the left margin sits clear of the paragraph column. */
+function withoutLeftMargin(rows: Row[], unit: number) {
+  const mains = rows.filter((row) => hanCount(row.text) >= 4 && row.width >= unit * 3);
+  if (mains.length < 3) return rows;
+  const lefts = mains.map((row) => row.left).sort((a, b) => a - b);
+  const mainLeft = lefts[Math.floor(lefts.length * 0.2)] ?? 0;
+  return rows.filter((row) => {
+    const gap = mainLeft - (row.left + row.width);
+    return gap < unit * 1.6 || hanCount(row.text) >= 5;
+  });
 }
 
 /**

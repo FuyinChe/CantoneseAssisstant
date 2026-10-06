@@ -149,6 +149,17 @@ if (droppedGot !== "澆讓它陽\n盼望幼苗能夠成長越高\n有一天翠�
   process.exit(1);
 }
 
+const marginGot = linesFromBoxes([
+  box("的信心，今天上中文課時", 220, 80, 400, 44),
+  box("讓志文向同學講故事", 220, 160, 380, 44),
+  box("志文站起來，感到臉", 220, 240, 360, 44),
+  box("王哪裡發", 0, 158, 90, 44),
+]);
+if (marginGot !== "的信心，今天上中文課時\n讓志文向同學講故事\n志文站起來，感到臉") {
+  console.log("FAIL left margin\n", JSON.stringify(marginGot));
+  process.exit(1);
+}
+
 function zhuyinLine(chars, y) {
   return chars.flatMap((text, i) => {
     const x = 20 + i * 78;
