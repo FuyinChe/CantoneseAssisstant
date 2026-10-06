@@ -41,6 +41,9 @@ yarn-error.log*
 # vercel
 .vercel
 
-# typescript
+# OCR weights and WASM runtime. Fetched by scripts/fetch-ocr-models.mjs and served from /ocr.
+/public/ocr/*.tar
+/public/ocr/ort/*
+!/public/ocr/ort/.gitkeep
 *.tsbuildinfo
 next-env.d.ts

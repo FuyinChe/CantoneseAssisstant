@@ -180,7 +180,7 @@ export function OcrPanel({ onText }: { onText: (text: string) => void }) {
 
   function ocrPhase(raw: string) {
     const status = raw.toLowerCase();
-    if (status.includes("language")) return t.ocrLoadingLang;
+    if (status.includes("model") || status.includes("language") || status.includes("download")) return t.ocrLoadingLang;
     if (status.includes("loading tesseract") || status.includes("loaded tesseract") || status.includes("core")) {
       return t.ocrPreparing;
     }
@@ -338,6 +338,15 @@ export function OcrPanel({ onText }: { onText: (text: string) => void }) {
     };
   }, []);
 
+  function recognizeFull() {
+    const source = fullCanvas();
+    if (!source) {
+      setError(t.needImage);
+      return;
+    }
+    void recognize(source);
+  }
+
   async function recognizeSelection() {
     const image = imageRef.current;
     const view = viewRef.current;
@@ -429,14 +438,7 @@ export function OcrPanel({ onText }: { onText: (text: string) => void }) {
           type="button"
           className="rounded-full border border-line bg-card px-4 py-2 text-[0.88rem] disabled:opacity-40"
           disabled={waiting}
-          onClick={() => {
-            const source = fullCanvas();
-            if (!source) {
-              setError(t.needImage);
-              return;
-            }
-            void recognize(source);
-          }}
+          onClick={recognizeFull}
         >
           {t.recognizeAll}
         </button>
@@ -554,11 +556,14 @@ export function OcrPanel({ onText }: { onText: (text: string) => void }) {
             }}
             onDoubleClick={(event) => {
               if (waiting) return;
-              const point = pointFromEvent(event);
-              if (!selection || selection.w < 8 || selection.h < 8) return;
-              if (!inside(selection, point, canvasSlop())) return;
               dragRef.current = null;
-              void recognizeSelection();
+              const point = pointFromEvent(event);
+              const crop = selection && selection.w >= 8 && selection.h >= 8 && inside(selection, point, canvasSlop());
+              if (crop) {
+                void recognizeSelection();
+                return;
+              }
+              recognizeFull();
             }}
           />
           {waiting ? (
@@ -580,6 +585,11 @@ export function OcrPanel({ onText }: { onText: (text: string) => void }) {
               className="absolute inset-0 text-foreground"
               aria-label={t.expandImage}
               onClick={() => setCollapsed(false)}
+              onDoubleClick={(event) => {
+                event.preventDefault();
+                if (waiting) return;
+                recognizeFull();
+              }}
             >
               <span className="absolute inset-x-0 bottom-0 flex h-7 items-center justify-center bg-card/80">
                 <DownArrow />
