@@ -149,6 +149,26 @@ if (droppedGot !== "澆讓它陽\n盼望幼苗能夠成長越高\n有一天翠�
   process.exit(1);
 }
 
+function zhuyinLine(chars, y) {
+  return chars.flatMap((text, i) => {
+    const x = 20 + i * 78;
+    return [
+      box(text, x, y, 46, 50),
+      box("公", x + 48, y + 2, 14, 14),
+      box("ㄨ", x + 48, y + 18, 14, 14),
+    ];
+  });
+}
+const zhuyinGot = linesFromBoxes([
+  ...zhuyinLine(["保", "羅", "和", "皮"], 80),
+  ...zhuyinLine(["要", "好", "的", "朋"], 170),
+  ...zhuyinLine(["爬", "樹", "時", "，"], 260),
+]);
+if (zhuyinGot !== "保羅和皮\n要好的朋\n爬樹時，") {
+  console.log("FAIL zhuyin right\n", JSON.stringify(zhuyinGot));
+  process.exit(1);
+}
+
 const tilted = ["固", "定", "幼", "苗", "後", "便", "給", "它"].map((text, i) =>
   box(text, 10 + i * 46, 80 + i * 4, 40, 42),
 );

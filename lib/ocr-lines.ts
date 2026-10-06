@@ -72,10 +72,21 @@ function isRubyBox(text: string, height: number, hanHeight: number) {
   return false;
 }
 
+const BOPOMOFO = /[\u3100-\u312F\u31A0-\u31BF]/;
+const BOPOMOFO_MARK = /[\u3100-\u312F\u31A0-\u31BF\u02CA\u02C7\u02CB\u02D9]/g;
+
+function stripBopomofo(text: string) {
+  return text.replace(BOPOMOFO_MARK, "");
+}
+
+function isOnlyBopomofo(text: string) {
+  return BOPOMOFO.test(text) && stripBopomofo(text).replace(/\s+/g, "").length === 0;
+}
+
 function joinParts(parts: Row[]) {
   return parts
     .sort((a, b) => a.left - b.left)
-    .map((part) => part.text)
+    .map((part) => stripBopomofo(part.text))
     .join("");
 }
 
@@ -162,8 +173,67 @@ function absorbScraps(lines: Row[][], spacing: number, unit: number) {
   return cores.sort((a, b) => median(a.map((part) => part.y)) - median(b.map((part) => part.y)));
 }
 
+function verticalOverlapRatio(a: Row, b: Row) {
+  const overlap = Math.min(a.y, b.y) - Math.max(a.y - a.height, b.y - b.height);
+  if (overlap <= 0) return 0;
+  return overlap / Math.min(a.height, b.height);
+}
+
+function isKeptPunct(text: string) {
+  return /^[，。！？；：、…—·「」『』“”''（）【】《》]+$/.test(text);
+}
+
+/**
+ * Taiwan textbooks put zhuyin in a short stack just to the right of each character.
+ * A page qualifies when that gutter pattern repeats across the paragraph.
+ */
+function zhuyinRuby(rows: Row[]) {
+  const heights = rows.map((row) => row.height).sort((a, b) => a - b);
+  const widths = rows.map((row) => row.width).sort((a, b) => a - b);
+  const mainH = heights[Math.floor(heights.length * 0.7)] || 32;
+  const mainW = widths[Math.floor(widths.length * 0.7)] || 32;
+  const mains = rows.filter(
+    (row) => row.height >= mainH * 0.75 && row.width >= mainW * 0.45 && !isOnlyBopomofo(row.text),
+  );
+  const byHost = new Map<Row, Row[]>();
+  for (const small of rows) {
+    if (mains.includes(small) || isKeptPunct(small.text)) continue;
+    if (small.height > mainH * 0.62 || small.width > mainW * 0.72) continue;
+    let host: Row | null = null;
+    let best = 0;
+    for (const main of mains) {
+      const overlap = verticalOverlapRatio(small, main);
+      if (overlap < 0.35) continue;
+      if (small.left < main.left + main.width * 0.58) continue;
+      if (small.left > main.left + main.width + mainW * 0.42) continue;
+      if (small.width > main.width * 0.72) continue;
+      if (overlap > best) {
+        best = overlap;
+        host = main;
+      }
+    }
+    if (!host) continue;
+    const list = byHost.get(host) ?? [];
+    list.push(small);
+    byHost.set(host, list);
+  }
+  const ruby = [...byHost.values()].flat();
+  const isPage = byHost.size >= 4 && ruby.length >= 6 && byHost.size / Math.max(mains.length, 1) >= 0.3;
+  return { isPage, ruby: new Set(ruby) };
+}
+
+/** Zhuyin pages skip the tilted-line rules and keep only the character columns. */
+function linesFromZhuyinPage(rows: Row[], ruby: Set<Row>, unit: number) {
+  const kept = rows.filter((row) => !ruby.has(row));
+  const { spacing, known } = stackedSpacing(kept, unit);
+  const limit = known ? Math.max(10, spacing * 0.4) : Math.max(10, unit * 0.55);
+  return clusterByBaseline(kept, limit)
+    .map(joinParts)
+    .join("\n");
+}
+
 /** Sort detected text boxes into horizontal lines, left to right. */
-export function linesFromBoxes(items: OcrBox[], minScore = 0.35) {
+export function linesFromBoxes(items: OcrBox[], minScore = 0.32) {
   const measured = items
     .filter((item) => item.text.trim() && item.score >= minScore && item.poly.length > 0)
     .map((item) => ({ text: item.text.trim(), ...measurePoly(item.poly) }))
@@ -171,9 +241,11 @@ export function linesFromBoxes(items: OcrBox[], minScore = 0.35) {
 
   const hanHeights = measured.filter((row) => hanCount(row.text) >= 1).map((row) => row.height);
   const hanHeight = median(hanHeights);
-  const rows = measured.filter((row) => !isRubyBox(row.text, row.height, hanHeight));
+  const rows = measured.filter((row) => !isRubyBox(row.text, row.height, hanHeight) && !isOnlyBopomofo(row.text));
   if (!rows.length) return "";
   const unit = median(rows.map((row) => row.height)) || hanHeight || 32;
+  const zhuyin = zhuyinRuby(rows);
+  if (zhuyin.isPage) return linesFromZhuyinPage(rows, zhuyin.ruby, unit);
   const { spacing, known } = stackedSpacing(rows, unit);
   const limit = known ? Math.max(10, spacing * 0.34) : Math.max(10, unit * 0.72);
 

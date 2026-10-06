@@ -1,6 +1,7 @@
 import { linesFromBoxes, type OcrBox } from "./ocr-lines";
 import { prepareOcrCanvas } from "./ocr-preprocess";
 import { cleanOcrText } from "./ocr-text";
+import { eraseZhuyinColumns } from "./ocr-zhuyin";
 
 type Paddle = {
   predict: (image: HTMLCanvasElement) => Promise<Array<{ items: OcrBox[] }>>;
@@ -92,6 +93,12 @@ export async function recognizeWithPaddle(
   // Keep short strokes (the dot of 文). Pinyin is removed by color, not by blob size.
   const prepared = prepareOcrCanvas(image, { removeShortInk: false });
   const engine = await getEngine(onProgress ?? (() => {}));
-  const [result] = await engine.predict(prepared);
-  return cleanOcrText(linesFromBoxes(result?.items ?? []));
+  const [first] = await engine.predict(prepared);
+  const items = first?.items ?? [];
+  const polys = items.filter((item) => item.poly.length > 0).map((item) => item.poly);
+  const bands = eraseZhuyinColumns(prepared, polys);
+  if (!bands.length) return cleanOcrText(linesFromBoxes(items));
+
+  const [second] = await engine.predict(prepared);
+  return cleanOcrText(linesFromBoxes(second?.items ?? items));
 }

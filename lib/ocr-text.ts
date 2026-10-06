@@ -112,6 +112,7 @@ export function isLikelyPinyinLine(line: string) {
 /** Collapse OCR gaps between Han; keep spaces around Latin / English runs. */
 export function cleanOcrLine(line: string) {
   return line
+    .replace(/[\u3100-\u312F\u31A0-\u31BF\u02CA\u02C7\u02CB\u02D9]/g, "")
     .replace(/\u00a0/g, " ")
     .replace(/^[0-9]+(?=\p{Script=Han})/u, "")
     .replace(/(?<=\p{Script=Han})\s+(?=\p{Script=Han})/gu, "")

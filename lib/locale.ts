@@ -35,7 +35,7 @@ const copy = {
     pagesLabel: "页面",
     copyright: `© ${siteYear} LearnLanguage`,
     input: "输入",
-    inputHint: "直接输入，或拍照、上传图片后识别整张或拖选一块。简体、繁体都可以；识别结果按原样进输入框，课本拼音行会尽量去掉。图片留在这台设备上。",
+    inputHint: "直接输入，或拍照、上传图片后识别整张或拖选一块。简体、繁体都可以；识别结果按原样进输入框，课本拼音行和台版右侧注音会尽量去掉。图片留在这台设备上。",
     inputPlaceholder: "简体或繁体都可以，例如：今天天气怎么样？",
     cantonese: "粤语表达",
     cantoneseHint: "点字听粤语。多音字点下面的粤拼可以改读音。",
@@ -108,7 +108,7 @@ const copy = {
     aboutEnglishBody: "简体句子会译成英文，并可以按英语朗读。朗读和英文翻译都会把这句话送到在线服务。",
     aboutOcr: "从图片识字",
     aboutOcrBody:
-      "可以拍照或从相册选一张图片，识别整张，或在图片上拖出一块再识别。选区可以挪动、改大小。认出的字会按原样填进输入框：简体保持简体，繁体保持繁体，混用也按识别结果。课本里上面一行拼音、下面一行汉字时，会尽量去掉拼音行，并保留同一行里的英文。图片留在这台设备上，识别完成后可以收起，只留一条预览。",
+      "可以拍照或从相册选一张图片，识别整张，或在图片上拖出一块再识别。选区可以挪动、改大小。认出的字会按原样填进输入框：简体保持简体，繁体保持繁体，混用也按识别结果。课本里上面一行拼音、下面一行汉字时，会尽量去掉拼音行；台版字右侧的注音也会去掉。同一行里的英文会保留。图片留在这台设备上，识别完成后可以收起，只留一条预览。",
     aboutStrokes: "笔顺工作纸",
     aboutStrokesBody:
       "香港繁体可以打开工作纸。笔顺临写按笔画展开，下面留田字格；长文本抄写是上面一行范字、下面一行田字格。可以勾选要打印的字，并在小方格和大方格之间切换，然后打印或另存为 PDF。",
@@ -158,7 +158,7 @@ const copy = {
     pagesLabel: "Pages",
     copyright: `© ${siteYear} LearnLanguage`,
     input: "Input",
-    inputHint: "Type, or take or upload a photo and recognize the whole image or a selection. Simplified or traditional Chinese both work; OCR keeps the recognized script and tries to drop textbook pinyin rows. Photos stay on this device.",
+    inputHint: "Type, or take or upload a photo and recognize the whole image or a selection. Simplified or traditional Chinese both work; OCR keeps the recognized script and tries to drop textbook pinyin rows and Taiwan zhuyin. Photos stay on this device.",
     inputPlaceholder: "Simplified or traditional Chinese, for example: 今天天气怎么样？",
     cantonese: "Cantonese",
     cantoneseHint: "Tap a character to hear Cantonese. Tap Jyutping under a character to change a reading.",
@@ -231,7 +231,7 @@ const copy = {
     aboutEnglishBody: "The simplified sentence is translated into English and can be read aloud. Speech and translation send the sentence to online services.",
     aboutOcr: "Text from photos",
     aboutOcrBody:
-      "Take a photo or choose one from the library, recognize the whole image, or drag a region. The region can be moved and resized. Recognized text fills the input as-is: simplified stays simplified, traditional stays traditional, and mixed text keeps both. Pinyin rows above characters in textbooks are filtered when possible, while English on the same line is kept. Photos stay on this device and can be collapsed after recognition.",
+      "Take a photo or choose one from the library, recognize the whole image, or drag a region. The region can be moved and resized. Recognized text fills the input as-is: simplified stays simplified, traditional stays traditional, and mixed text keeps both. Pinyin rows above characters are filtered when possible, and Taiwan zhuyin beside a character is removed. English on the same line is kept. Photos stay on this device and can be collapsed after recognition.",
     aboutStrokes: "Stroke worksheets",
     aboutStrokesBody:
       "Hong Kong traditional can open a worksheet. Stroke practice shows each character stroke by stroke with Tianzige boxes below. Copying practice puts a model character on the top row and a Tianzige box on the row beneath. You can choose which characters to print, switch between small and large boxes, then print or save as PDF.",
