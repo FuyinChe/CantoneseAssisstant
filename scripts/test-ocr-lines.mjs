@@ -29,6 +29,12 @@ if (got !== expect) {
   process.exit(1);
 }
 
+const withLetter = linesFromBoxes([...items, box("æ", 200, 210, 28, 30)]);
+if (withLetter !== expect) {
+  console.log("FAIL lone letter", JSON.stringify(withLetter));
+  process.exit(1);
+}
+
 const same = linesFromBoxes([
   box("固", 10, 100, 40, 42),
   box("定", 52, 104, 40, 42),
@@ -177,6 +183,37 @@ const zhuyinGot = linesFromBoxes([
 ]);
 if (zhuyinGot !== "保羅和皮\n要好的朋\n爬樹時，") {
   console.log("FAIL zhuyin right\n", JSON.stringify(zhuyinGot));
+  process.exit(1);
+}
+
+const indentLine = (chars, x, y) => chars.map((text, i) => box(text, x + i * 44, y, 40, 42));
+const indentGot = linesFromBoxes([
+  ...indentLine(["在", "清", "朝", "時", "借", "了", "一", "百"], 100, 80),
+  ...indentLine(["元", "銀"], 12, 96),
+  ...indentLine(["幣", "沒", "有", "立", "借", "據"], 100, 170),
+  ...indentLine(["如", "數", "償", "還", "到", "了"], 12, 260),
+  ...indentLine(["約", "定", "的", "日", "期", "還"], 12, 350),
+]);
+if (indentGot !== "在清朝時借了一百\n元銀幣沒有立借據\n如數償還到了\n約定的日期還") {
+  console.log("FAIL first-line indent\n", JSON.stringify(indentGot));
+  process.exit(1);
+}
+
+const punctGot = linesFromBoxes([
+  box("幣", 10, 80, 40, 42),
+  box('"', 52, 108, 12, 14, 0.22),
+  box("沒", 70, 80, 40, 42),
+  box("有", 114, 80, 40, 42),
+  box("如", 12, 170, 40, 42),
+  box("數", 56, 170, 40, 42),
+  box("償", 100, 170, 40, 42),
+  box("還", 144, 170, 40, 42),
+  box("。", 186, 196, 14, 16, 0.24),
+  box("到", 210, 170, 40, 42),
+  box("了", 254, 170, 40, 42),
+]);
+if (punctGot !== '幣"沒有\n如數償還。到了') {
+  console.log("FAIL punctuation boxes\n", JSON.stringify(punctGot));
   process.exit(1);
 }
 

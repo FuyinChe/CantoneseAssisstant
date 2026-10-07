@@ -310,6 +310,106 @@ export function removeHandMarks(image: ImageData, circles = true) {
   return image;
 }
 
+function sampleMean(
+  data: Uint8ClampedArray,
+  width: number,
+  y0: number,
+  y1: number,
+) {
+  let sum = 0;
+  let count = 0;
+  for (let y = y0; y < y1; y += 2) {
+    for (let x = 0; x < width; x += 4) {
+      const index = (y * width + x) * 4;
+      sum += luminance(data[index], data[index + 1], data[index + 2]);
+      count += 1;
+    }
+  }
+  return sum / Math.max(count, 1);
+}
+
+function blurLuminance(source: Float32Array, width: number, height: number, radius: number) {
+  const blurred = new Float32Array(source.length);
+  const window = radius * 2 + 1;
+  for (let y = 0; y < height; y++) {
+    for (let x = 0; x < width; x++) {
+      let sum = 0;
+      for (let dy = -radius; dy <= radius; dy++) {
+        const yy = Math.min(height - 1, Math.max(0, y + dy));
+        for (let dx = -radius; dx <= radius; dx++) {
+          const xx = Math.min(width - 1, Math.max(0, x + dx));
+          sum += source[yy * width + xx];
+        }
+      }
+      blurred[y * width + x] = sum / (window * window);
+    }
+  }
+  return blurred;
+}
+
+function sampleBackground(background: Float32Array, smallWidth: number, smallHeight: number, x: number, y: number) {
+  const fx = Math.min(smallWidth - 1, Math.max(0, x));
+  const fy = Math.min(smallHeight - 1, Math.max(0, y));
+  const x0 = Math.floor(fx);
+  const y0 = Math.floor(fy);
+  const x1 = Math.min(smallWidth - 1, x0 + 1);
+  const y1 = Math.min(smallHeight - 1, y0 + 1);
+  const tx = fx - x0;
+  const ty = fy - y0;
+  const top = background[y0 * smallWidth + x0] * (1 - tx) + background[y0 * smallWidth + x1] * tx;
+  const bottom = background[y1 * smallWidth + x0] * (1 - tx) + background[y1 * smallWidth + x1] * tx;
+  return top * (1 - ty) + bottom * ty;
+}
+
+/**
+ * A phone photo of a page often darkens toward one edge. Divide by a
+ * heavy blur so the paper is even and the lighter lines stay detectable.
+ * Returns false when the page is already even, and leaves the pixels alone.
+ */
+export function flattenIllumination(image: ImageData) {
+  const { width, height, data } = image;
+  if (width < 40 || height < 40) return false;
+  const top = sampleMean(data, width, 0, Math.floor(height * 0.18));
+  const bottom = sampleMean(data, width, Math.floor(height * 0.82), height);
+  if (Math.abs(top - bottom) < 22) return false;
+
+  const smallWidth = 96;
+  const smallHeight = Math.max(8, Math.round(height * (smallWidth / width)));
+  const small = new Float32Array(smallWidth * smallHeight);
+  for (let y = 0; y < smallHeight; y++) {
+    const y0 = Math.floor((y * height) / smallHeight);
+    const y1 = Math.max(y0 + 1, Math.floor(((y + 1) * height) / smallHeight));
+    for (let x = 0; x < smallWidth; x++) {
+      const x0 = Math.floor((x * width) / smallWidth);
+      const x1 = Math.max(x0 + 1, Math.floor(((x + 1) * width) / smallWidth));
+      let sum = 0;
+      let count = 0;
+      for (let yy = y0; yy < y1; yy += 2) {
+        for (let xx = x0; xx < x1; xx += 2) {
+          const index = (yy * width + xx) * 4;
+          sum += luminance(data[index], data[index + 1], data[index + 2]);
+          count += 1;
+        }
+      }
+      small[y * smallWidth + x] = sum / Math.max(count, 1);
+    }
+  }
+  const background = blurLuminance(small, smallWidth, smallHeight, 6);
+  for (let y = 0; y < height; y++) {
+    const sy = ((y + 0.5) * smallHeight) / height - 0.5;
+    for (let x = 0; x < width; x++) {
+      const sx = ((x + 0.5) * smallWidth) / width - 0.5;
+      const paper = Math.max(1, sampleBackground(background, smallWidth, smallHeight, sx, sy));
+      const index = (y * width + x) * 4;
+      const value = clampByte((luminance(data[index], data[index + 1], data[index + 2]) / paper) * 255);
+      data[index] = value;
+      data[index + 1] = value;
+      data[index + 2] = value;
+    }
+  }
+  return true;
+}
+
 function scaleForOcr(width: number, height: number) {
   const target = width < SMALL_SOURCE ? TARGET_WIDTH_SMALL : TARGET_WIDTH;
   if (width >= target) {
@@ -353,12 +453,14 @@ export function prepareOcrCanvas(source: HTMLCanvasElement, options?: Preprocess
     if (wipeMarks) removeHandMarks(image, !shortCrop);
     context.putImageData(image, 0, 0);
   } else if (wipeMarks) {
-    for (let i = 0; i < image.data.length; i += 4) {
-      const value = luminance(image.data[i], image.data[i + 1], image.data[i + 2]);
-      const ink = clampByte(Math.round(value));
-      image.data[i] = ink;
-      image.data[i + 1] = ink;
-      image.data[i + 2] = ink;
+    if (!flattenIllumination(image)) {
+      for (let i = 0; i < image.data.length; i += 4) {
+        const value = luminance(image.data[i], image.data[i + 1], image.data[i + 2]);
+        const ink = clampByte(Math.round(value));
+        image.data[i] = ink;
+        image.data[i + 1] = ink;
+        image.data[i + 2] = ink;
+      }
     }
     removeHandMarks(image, !shortCrop);
     context.putImageData(image, 0, 0);

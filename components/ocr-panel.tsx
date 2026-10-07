@@ -398,14 +398,14 @@ export function OcrPanel({ onText }: { onText: (text: string) => void }) {
       <div className="relative flex flex-wrap gap-2">
         <button
           type="button"
-          className="rounded-full bg-foreground px-4 py-2 text-[0.88rem] text-background disabled:opacity-40"
+          className="ocr-action ocr-action-primary rounded-full bg-foreground px-4 py-2 text-[0.88rem] text-background disabled:opacity-40"
           aria-label={t.cameraAria}
           disabled={waiting}
           onClick={() => void startCamera()}
         >
           {t.camera}
         </button>
-        <label className={`relative inline-flex items-center rounded-full border border-line bg-card px-4 py-2 text-[0.88rem] ${waiting ? "pointer-events-none opacity-40" : "cursor-pointer"}`}>
+        <label className={`ocr-action relative inline-flex items-center rounded-full bg-card px-4 py-2 text-[0.88rem] ${waiting ? "pointer-events-none opacity-40" : "cursor-pointer"}`}>
           {t.upload}
           <input
             className="absolute inset-0 cursor-pointer opacity-0"
@@ -436,7 +436,7 @@ export function OcrPanel({ onText }: { onText: (text: string) => void }) {
         />
         <button
           type="button"
-          className="rounded-full border border-line bg-card px-4 py-2 text-[0.88rem] disabled:opacity-40"
+          className="ocr-action rounded-full bg-card px-4 py-2 text-[0.88rem] disabled:opacity-40"
           disabled={waiting}
           onClick={recognizeFull}
         >
@@ -444,7 +444,7 @@ export function OcrPanel({ onText }: { onText: (text: string) => void }) {
         </button>
         <button
           type="button"
-          className="rounded-full border border-line bg-card px-4 py-2 text-[0.88rem] disabled:opacity-40"
+          className="ocr-action rounded-full bg-card px-4 py-2 text-[0.88rem] disabled:opacity-40"
           disabled={waiting}
           onClick={() => void recognizeSelection()}
         >
@@ -453,7 +453,7 @@ export function OcrPanel({ onText }: { onText: (text: string) => void }) {
         {hasImage && !collapsed ? (
           <button
             type="button"
-            className="rounded-full border border-line bg-card px-4 py-2 text-[0.88rem] disabled:opacity-40"
+            className="ocr-action rounded-full bg-card px-4 py-2 text-[0.88rem] disabled:opacity-40"
             disabled={waiting}
             onClick={() => setCollapsed(true)}
           >
