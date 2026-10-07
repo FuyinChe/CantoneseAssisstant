@@ -44,6 +44,33 @@ select {
   font-family: inherit;
 }
 
+.ocr-action {
+  border: none;
+  transition:
+    transform 160ms ease,
+    background-color 160ms ease,
+    box-shadow 160ms ease,
+    color 160ms ease;
+}
+
+.ocr-action:hover:not(:disabled) {
+  background: var(--accent-soft);
+  color: var(--accent);
+  transform: translateY(-1px);
+  box-shadow: 0 6px 16px rgba(156, 59, 46, 0.1);
+}
+
+.ocr-action:active:not(:disabled) {
+  transform: translateY(0) scale(0.97);
+  box-shadow: none;
+}
+
+.ocr-action-primary:hover:not(:disabled) {
+  background: var(--accent);
+  color: #fff;
+  box-shadow: 0 6px 16px rgba(156, 59, 46, 0.22);
+}
+
 @keyframes ocr-slide {
   0% {
     transform: translateX(-120%);

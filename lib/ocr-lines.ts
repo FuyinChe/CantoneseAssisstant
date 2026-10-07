@@ -62,12 +62,24 @@ function latinCount(text: string) {
   return (text.match(/\p{Script=Latin}/gu) ?? []).length;
 }
 
+/** A comma or period is shorter than a character and has no Han of its own. */
+const PUNCT_BOX =
+  /^[，。！？；：、“”‘’「」『』（）【】《》…—·、,.!?;:'"*°]+$/u;
+
+function isPunctuationText(text: string) {
+  const trimmed = text.trim();
+  return trimmed.length > 0 && PUNCT_BOX.test(trimmed);
+}
+
 /** Pinyin ruby sits in its own short box, or is almost only Latin. */
 function isRubyBox(text: string, height: number, hanHeight: number) {
+  if (isPunctuationText(text)) return false;
   const han = hanCount(text);
   const latin = latinCount(text);
   if (han === 0 && latin >= 2) return true;
   if (latin >= 4 && latin > han) return true;
+  // One leftover letter (de read as æ) is pinyin, not a character.
+  if (han === 0 && latin === 1 && /^[\p{Script=Latin}]$/u.test(text)) return true;
   if (han === 0 && hanHeight > 0 && height < hanHeight * 0.62) return true;
   return false;
 }
@@ -162,7 +174,9 @@ function absorbScraps(lines: Row[][], spacing: number, unit: number) {
       const dy = Math.abs(coreY - piece.y);
       const tail = onRight && coreY >= piece.y && dy <= spacing * 0.65;
       const head = onLeft && coreY <= piece.y && dy <= spacing * 0.8;
-      if ((tail || head) && dy < bestDy) {
+      // A continuation line starts in the first-line indent, a full row below.
+      const indentWrap = head && coreLeft - piece.left >= unit * 1.7 && coreLeft - piece.left <= unit * 3.1 && dy > unit * 0.5;
+      if ((tail || head) && !indentWrap && dy < bestDy) {
         bestDy = dy;
         best = i;
       }
@@ -180,7 +194,7 @@ function verticalOverlapRatio(a: Row, b: Row) {
 }
 
 function isKeptPunct(text: string) {
-  return /^[，。！？；：、…—·「」『』“”''（）【】《》]+$/.test(text);
+  return isPunctuationText(text);
 }
 
 /**
@@ -235,7 +249,12 @@ function linesFromZhuyinPage(rows: Row[], ruby: Set<Row>, unit: number) {
 /** Sort detected text boxes into horizontal lines, left to right. */
 export function linesFromBoxes(items: OcrBox[], minScore = 0.32) {
   const measured = items
-    .filter((item) => item.text.trim() && item.score >= minScore && item.poly.length > 0)
+    .filter((item) => {
+      const text = item.text.trim();
+      if (!text || item.poly.length === 0) return false;
+      // A faint comma is still a comma. Han boxes keep the stricter floor.
+      return item.score >= (isPunctuationText(text) ? Math.min(minScore, 0.18) : minScore);
+    })
     .map((item) => ({ text: item.text.trim(), ...measurePoly(item.poly) }))
     .sort((a, b) => a.y - b.y || a.left - b.left);
 
@@ -251,7 +270,7 @@ export function linesFromBoxes(items: OcrBox[], minScore = 0.32) {
   const limit = known ? Math.max(10, spacing * 0.34) : Math.max(10, unit * 0.72);
 
   return joinRaisedRights(
-    absorbScraps(peelRaisedLefts(clusterByBaseline(body, limit), unit), spacing, unit),
+    absorbScraps(releaseIndentHeads(peelRaisedLefts(clusterByBaseline(body, limit), unit), unit), spacing, unit),
     spacing,
     unit,
   )
@@ -269,6 +288,53 @@ function withoutLeftMargin(rows: Row[], unit: number) {
     const gap = mainLeft - (row.left + row.width);
     return gap < unit * 1.6 || hanCount(row.text) >= 5;
   });
+}
+
+/**
+ * Printed paragraphs indent the first line by about two characters.
+ * The next line returns to the left margin, so its first characters sit in
+ * that gap. If their boxes are a little high, they would join the indented
+ * line. Put them back on the line below.
+ */
+function releaseIndentHeads(lines: Row[][], unit: number) {
+  if (lines.length < 3) return lines;
+  const lefts = lines.map((line) => Math.min(...line.map((part) => part.left))).sort((a, b) => a - b);
+  const columnLeft = lefts[Math.floor(lefts.length * 0.15)] ?? lefts[0];
+  const out: Row[][] = [];
+  let carry: Row[] = [];
+  for (const line of lines) {
+    const parts = [...carry, ...line].sort((a, b) => a.left - b.left);
+    carry = [];
+    const bodyIndex = parts.findIndex((part) => {
+      const indent = part.left - columnLeft;
+      return indent >= unit * 1.7 && indent <= unit * 3.1;
+    });
+    if (bodyIndex <= 0) {
+      out.push(parts);
+      continue;
+    }
+    const prefix = parts.slice(0, bodyIndex);
+    const body = parts.slice(bodyIndex);
+    const bodyLeft = parts[bodyIndex].left;
+    const prefixHan = prefix.reduce((sum, part) => sum + hanCount(part.text), 0);
+    const prefixRight = Math.max(...prefix.map((part) => part.left + part.width));
+    const drop = median(prefix.map((part) => part.y)) - median(body.map((part) => part.y));
+    const gutter =
+      prefixHan >= 1 &&
+      prefixHan <= 3 &&
+      prefix.every((part) => hanCount(part.text) <= 2 && part.width < unit * 2.2) &&
+      prefixRight <= bodyLeft + unit * 0.25 &&
+      drop >= unit * 0.18 &&
+      drop <= unit * 0.75;
+    if (!gutter) {
+      out.push(parts);
+      continue;
+    }
+    carry = prefix;
+    out.push(body);
+  }
+  if (carry.length) out.push(carry);
+  return out;
 }
 
 /**
@@ -326,6 +392,12 @@ function joinRaisedRights(lines: Row[][], spacing: number, unit: number) {
         const lower = pending[j];
         const dy = lower.y - upper.y;
         if (dy < 0 || dy > limit) continue;
+        const upperHan = upper.parts.reduce((sum, part) => sum + hanCount(part.text), 0);
+        const lowerHan = lower.parts.reduce((sum, part) => sum + hanCount(part.text), 0);
+        const upperWidth = upper.right - upper.left;
+        const lowerWidth = lower.right - lower.left;
+        // A full indented line must not swallow the two characters under its indent.
+        if (upperHan >= 4 && lowerHan <= 3 && upperWidth > lowerWidth * 1.6) continue;
         const gap = upper.left - lower.right;
         if (gap < -unit * 0.35 || gap > Math.max(spacing, unit) * 2.5) continue;
         if (dy < bestDy) {
