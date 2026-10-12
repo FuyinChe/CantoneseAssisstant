@@ -5,7 +5,12 @@ import type { SpeechLang } from "./types";
 
 const TOKEN = "6A5AA1D4EAFF4E9FB37E23D68491D6F4";
 const CHROMIUM_VERSION = "143.0.3650.75";
-const WSS_URL = `wss://speech.platform.bing.com/consumer/speech/synthesize/readaloud/edge/v1?TrustedClientToken=${TOKEN}`;
+// Microsoft is moving Read Aloud off speech.platform.bing.com. The new host
+// still accepts the same Sec-MS-GEC token. The old host is the fallback.
+const ENDPOINTS = [
+  `wss://api.msedgeservices.com/tts/cognitiveservices/websocket/v1?Ocp-Apim-Subscription-Key=${TOKEN}`,
+  `wss://speech.platform.bing.com/consumer/speech/synthesize/readaloud/edge/v1?TrustedClientToken=${TOKEN}`,
+];
 const WIN_EPOCH = 11644473600;
 
 function secMsGec(skewSeconds = 0) {
@@ -57,9 +62,9 @@ function audioChunk(message: Buffer) {
   return body;
 }
 
-function connect(text: string, lang: SpeechLang, skewSeconds: number) {
+function connect(text: string, lang: SpeechLang, skewSeconds: number, endpoint: string) {
   const connectionId = randomUUID().replaceAll("-", "");
-  const url = `${WSS_URL}&ConnectionId=${connectionId}&Sec-MS-GEC=${secMsGec(skewSeconds)}&Sec-MS-GEC-Version=1-${CHROMIUM_VERSION}`;
+  const url = `${endpoint}&ConnectionId=${connectionId}&Sec-MS-GEC=${secMsGec(skewSeconds)}&Sec-MS-GEC-Version=1-${CHROMIUM_VERSION}`;
   return new Promise<Buffer>((resolve, reject) => {
     const socket = new WebSocket(url, {
       headers: {
@@ -121,12 +126,24 @@ function connect(text: string, lang: SpeechLang, skewSeconds: number) {
   });
 }
 
-export async function synthesizeEdge(text: string, lang: SpeechLang) {
+async function connectWithSkew(text: string, lang: SpeechLang, endpoint: string) {
   try {
-    return await connect(text, lang, 0);
+    return await connect(text, lang, 0, endpoint);
   } catch (error) {
     const skew = error instanceof Error && "skew" in error ? Number(error.skew) : Number.NaN;
     if (!Number.isFinite(skew)) throw error;
-    return connect(text, lang, skew);
+    return connect(text, lang, skew, endpoint);
   }
+}
+
+export async function synthesizeEdge(text: string, lang: SpeechLang) {
+  let last: unknown;
+  for (const endpoint of ENDPOINTS) {
+    try {
+      return await connectWithSkew(text, lang, endpoint);
+    } catch (error) {
+      last = error;
+    }
+  }
+  throw last instanceof Error ? last : new Error("在线语音暂时不可用。");
 }
