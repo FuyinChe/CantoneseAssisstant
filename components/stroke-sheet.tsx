@@ -3,6 +3,7 @@
 import { useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import type { SheetBoxSize } from "@/lib/stroke-pdf";
+import { SHEET_KAI } from "@/lib/sheet-font";
 import { siteName, siteNameEn, siteUrl } from "@/lib/site";
 import { loadStrokes } from "@/lib/strokes";
 import { TIANZI_VIEW, glyphTransform, tianziMarks } from "@/lib/tianzi";
@@ -33,60 +34,39 @@ function TianziMarks() {
   );
 }
 
-function StrokeGlyph({
-  strokes,
-  through,
-  complete = false,
-  framed = false,
-}: {
-  strokes: string[];
-  through: number;
-  complete?: boolean;
-  framed?: boolean;
-}) {
+function StrokeGlyph({ strokes, through }: { strokes: string[]; through: number }) {
   const transform = glyphTransform(TIANZI_VIEW);
   return (
-    <svg viewBox={`0 0 ${TIANZI_VIEW} ${TIANZI_VIEW}`} className={framed ? "model-box" : "stroke-box"} aria-hidden="true">
-      {framed ? (
-        <rect x="0.5" y="0.5" width={TIANZI_VIEW - 1} height={TIANZI_VIEW - 1} className="practice-frame" fill="#fff" />
-      ) : null}
+    <svg viewBox={`0 0 ${TIANZI_VIEW} ${TIANZI_VIEW}`} className="stroke-box" aria-hidden="true">
       <TianziMarks />
       <g transform={transform}>
         {strokes.slice(0, through).map((path, index) => (
-          <path key={index} d={path} fill={complete || index < through - 1 ? "#1f1a14" : "#9c3b2e"} />
+          <path key={index} d={path} fill={index < through - 1 ? "#1f1a14" : "#9c3b2e"} />
         ))}
       </g>
     </svg>
   );
 }
 
-function PunctGlyph({ char }: { char: string }) {
+function ModelGlyph({ char }: { char: string }) {
+  if (!hanPattern.test(char) && !punctPattern.test(char)) return <PracticeBox />;
   return (
     <svg viewBox={`0 0 ${TIANZI_VIEW} ${TIANZI_VIEW}`} className="model-box" aria-hidden="true">
       <rect x="0.5" y="0.5" width={TIANZI_VIEW - 1} height={TIANZI_VIEW - 1} className="practice-frame" fill="#fff" />
       <TianziMarks />
       <text
         x={TIANZI_VIEW / 2}
-        y={TIANZI_VIEW / 2 + 1}
+        y={TIANZI_VIEW / 2}
         textAnchor="middle"
-        dominantBaseline="middle"
-        fontSize={TIANZI_VIEW * 0.48}
+        dominantBaseline="central"
+        fontFamily={SHEET_KAI}
+        fontSize={hanPattern.test(char) ? TIANZI_VIEW * 0.72 : TIANZI_VIEW * 0.48}
         fill="#1f1a14"
       >
         {char}
       </text>
     </svg>
   );
-}
-
-function ModelGlyph({ char, strokes }: { char: string; strokes: string[] | null | undefined }) {
-  if (strokes && strokes.length > 0) {
-    return <StrokeGlyph strokes={strokes} through={strokes.length} complete framed />;
-  }
-  if (punctPattern.test(char)) {
-    return <PunctGlyph char={char} />;
-  }
-  return <PracticeBox />;
 }
 
 function PracticeBox() {
@@ -340,7 +320,7 @@ export function StrokeSheet({ text }: { text: string }) {
           <article className="mx-auto flex w-full max-w-[186mm] flex-col gap-8 bg-white px-6 py-8 text-neutral-900">
             <header>
               <h2 className="text-2xl font-semibold">{title}</h2>
-              <p className="mt-2 text-xl leading-relaxed">{text}</p>
+              <p className="mt-2 text-xl leading-relaxed" style={{ fontFamily: SHEET_KAI }}>{text}</p>
               {truncated ? <p className="mt-2 text-sm text-neutral-600">句子较长，这张纸只排前 {limit} 个字。</p> : null}
             </header>
             {loading ? <p>正在准备笔顺…</p> : null}
@@ -350,7 +330,7 @@ export function StrokeSheet({ text }: { text: string }) {
               <div className="copy-grid">
                 {copied.map((char, index) => (
                   <div key={`${char}-${index}`} className="copy-pair">
-                    <ModelGlyph char={char} strokes={strokes[char]} />
+                    <ModelGlyph char={char} />
                     <PracticeBox />
                   </div>
                 ))}
@@ -361,7 +341,7 @@ export function StrokeSheet({ text }: { text: string }) {
                 const paths = strokes[char];
                 return (
                   <section key={`${char}-${index}`} className="flex flex-col gap-3 break-inside-avoid">
-                    <h3 className="text-3xl font-medium">{char}</h3>
+                    <h3 className="text-3xl font-medium" style={{ fontFamily: SHEET_KAI }}>{char}</h3>
                     {paths && paths.length > 0 ? (
                       <ol className="flex flex-wrap gap-[var(--box-gap)]">
                         {paths.map((_, step) => (
@@ -385,9 +365,9 @@ export function StrokeSheet({ text }: { text: string }) {
             )}
             <footer className="sheet-print-footer border-t border-neutral-200 pt-4 text-xs text-neutral-500">
               {mode === "copy" ? (
-                <p>上一行范字，下一行田字格，供抄写。田字格虚线会印在纸上。</p>
+                <p>上一行范字用标楷体-港澳，下一行田字格供抄写。田字格虚线会印在纸上。</p>
               ) : (
-                <p>笔顺按 Make Me a Hanzi 的笔画数据绘出，供临写参考。</p>
+                <p>字头用标楷体-港澳。分步笔画按 Make Me a Hanzi 绘出，供临写参考。</p>
               )}
               <p className="mt-2">{siteName} · {siteNameEn}</p>
               <p>
