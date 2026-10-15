@@ -1,4 +1,5 @@
 import { PDFDocument, StandardFonts, rgb, type PDFFont, type PDFImage, type PDFPage } from "pdf-lib";
+import { SHEET_KAI } from "@/lib/sheet-font";
 import { siteName, siteNameEn, siteUrl } from "@/lib/site";
 import { glyphTransform, tianziMarks, tianziSvgMarks, TIANZI_INK } from "@/lib/tianzi";
 
@@ -145,15 +146,6 @@ function strokeSvg(strokes: string[], through: number, box: number) {
   </svg>`;
 }
 
-function modelSvg(strokes: string[], box: number) {
-  const paths = strokes.map((path) => `<path d="${escapeAttr(path)}" fill="#1f1a14"/>`).join("");
-  return `<svg xmlns="http://www.w3.org/2000/svg" width="${box}" height="${box}" viewBox="0 0 ${box} ${box}">
-    <rect x="0.5" y="0.5" width="${box - 1}" height="${box - 1}" fill="#ffffff" stroke="#44403c"/>
-    ${tianzi(box)}
-    <g transform="${glyphTransform(box)}">${paths}</g>
-  </svg>`;
-}
-
 function practiceSvg(box: number) {
   return `<svg xmlns="http://www.w3.org/2000/svg" width="${box}" height="${box}" viewBox="0 0 ${box} ${box}">
     <rect x="0.5" y="0.5" width="${box - 1}" height="${box - 1}" fill="#ffffff" stroke="#44403c"/>
@@ -163,7 +155,7 @@ function practiceSvg(box: number) {
 
 const hanPattern = /\p{Script=Han}/u;
 
-function punctCanvas(char: string, box: number) {
+function modelTextCanvas(char: string, box: number, sizeRatio: number) {
   const canvas = document.createElement("canvas");
   canvas.width = Math.ceil(box * GLYPH_RATIO);
   canvas.height = Math.ceil(box * GLYPH_RATIO);
@@ -180,10 +172,10 @@ function punctCanvas(char: string, box: number) {
     context.fillRect(mark.x, mark.y, mark.w, mark.h);
   }
   context.fillStyle = "#1f1a14";
-  context.font = `500 ${box * 0.48}px ${FONT}`;
+  context.font = `500 ${box * sizeRatio}px ${SHEET_KAI}`;
   context.textAlign = "center";
   context.textBaseline = "middle";
-  context.fillText(char, box / 2, box / 2 + box * 0.02);
+  context.fillText(char, box / 2, box / 2);
   return canvas;
 }
 
@@ -220,12 +212,13 @@ type TextLine = {
   size: number;
   weight: number;
   color: string;
+  fontFamily?: string;
 };
 
 function paintLines(lines: TextLine[], maxWidth: number) {
   const measure = document.createElement("canvas").getContext("2d");
   if (!measure) throw new Error("PDF 暂时没有保存下来。");
-  const fontOf = (line: TextLine) => `${line.weight} ${line.size}px ${FONT}`;
+  const fontOf = (line: TextLine) => `${line.weight} ${line.size}px ${line.fontFamily ?? FONT}`;
   const wrapped: { text: string; line: TextLine; height: number }[] = [];
   for (const line of lines) {
     measure.font = fontOf(line);
@@ -324,7 +317,7 @@ export async function downloadStrokePdf(input: {
   doc.setTitle("香港繁体笔顺工作纸");
   const font = await doc.embedFont(StandardFonts.Helvetica);
   const footer = await embedFooter(doc, [
-    "笔顺按 Make Me a Hanzi 的笔画数据绘出，供临写参考。",
+    "字头用标楷体-港澳。分步笔画按 Make Me a Hanzi 绘出，供临写参考。",
     `${siteName} · ${siteNameEn}`,
     siteUrl,
   ]);
@@ -352,7 +345,7 @@ export async function downloadStrokePdf(input: {
   let cursor: Cursor = { page: doc.addPage(A4), y: contentTop() };
   const header: TextLine[] = [
     { text: "香港繁体笔顺工作纸", size: 22, weight: 600, color: "#1c1917" },
-    { text: input.sentence, size: 16, weight: 400, color: "#1c1917" },
+    { text: input.sentence, size: 16, weight: 400, color: "#1c1917", fontFamily: SHEET_KAI },
   ];
   if (input.truncated) {
     header.push({ text: "句子较长，这张纸只排前 40 个字。", size: 11, weight: 400, color: "#57534e" });
@@ -375,7 +368,7 @@ export async function downloadStrokePdf(input: {
     }
     const follow = item.strokes && item.strokes.length > 0 ? layout.box + 16 : 28;
     cursor = await drawText(doc, cursor, [
-      { text: item.char, size: 28, weight: 500, color: "#1c1917" },
+      { text: item.char, size: 28, weight: 500, color: "#1c1917", fontFamily: SHEET_KAI },
     ], 8, follow);
     if (item.strokes && item.strokes.length > 0) {
       for (let start = 0; start < item.strokes.length; start += perRow) {
@@ -417,7 +410,7 @@ export async function downloadCopyPdf(input: {
   doc.setTitle("香港繁体抄写工作纸");
   const font = await doc.embedFont(StandardFonts.Helvetica);
   const footer = await embedFooter(doc, [
-    "上一行范字，下一行田字格，供抄写。",
+    "上一行范字用标楷体-港澳，下一行田字格供抄写。",
     `${siteName} · ${siteNameEn}`,
     siteUrl,
   ]);
@@ -425,20 +418,16 @@ export async function downloadCopyPdf(input: {
   const models = new Map<string, PDFImage>();
   const unique = [...new Set(input.items.map((item) => item.char))];
   await Promise.all(unique.map(async (char) => {
-    const strokes = input.items.find((item) => item.char === char)?.strokes ?? [];
-    if (strokes.length > 0) {
-      models.set(char, await doc.embedPng(pngBytes(await rasterSvg(modelSvg(strokes, layout.box), layout.box))));
-    } else if (!hanPattern.test(char)) {
-      models.set(char, await doc.embedPng(pngBytes(punctCanvas(char, layout.box))));
-    } else {
-      models.set(char, practice);
-    }
+    models.set(
+      char,
+      await doc.embedPng(pngBytes(modelTextCanvas(char, layout.box, hanPattern.test(char) ? 0.72 : 0.48))),
+    );
   }));
 
   let cursor: Cursor = { page: doc.addPage(A4), y: contentTop() };
   const header: TextLine[] = [
     { text: "香港繁体抄写工作纸", size: 22, weight: 600, color: "#1c1917" },
-    { text: input.sentence, size: 16, weight: 400, color: "#1c1917" },
+    { text: input.sentence, size: 16, weight: 400, color: "#1c1917", fontFamily: SHEET_KAI },
   ];
   if (input.truncated) {
     header.push({ text: "句子较长，这张纸只排前 120 个字。", size: 11, weight: 400, color: "#57534e" });
