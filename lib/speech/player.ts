@@ -1,4 +1,5 @@
 import { BrowserSpeech } from "./browser";
+import { clampSpeechRate } from "./sentences";
 import type { SpeechEngine, SpeechLang } from "./types";
 
 class LearningSpeech implements SpeechEngine {
@@ -8,6 +9,12 @@ class LearningSpeech implements SpeechEngine {
   private url: string | null = null;
   private controller: AbortController | null = null;
   private request = 0;
+  private playbackRate = 1;
+
+  setPlaybackRate(rate: number) {
+    this.playbackRate = clampSpeechRate(rate);
+    if (this.audio) this.audio.playbackRate = this.playbackRate;
+  }
 
   private stopAudio() {
     const audio = this.audio;
@@ -26,6 +33,7 @@ class LearningSpeech implements SpeechEngine {
     this.stopAudio();
     const url = URL.createObjectURL(blob);
     const audio = new Audio(url);
+    audio.playbackRate = this.playbackRate;
     this.audio = audio;
     this.url = url;
     return new Promise<void>((resolve, reject) => {
@@ -44,9 +52,10 @@ class LearningSpeech implements SpeechEngine {
     });
   }
 
-  async speak(text: string, lang: SpeechLang) {
+  async speak(text: string, lang: SpeechLang, rate = 1) {
     const spoken = text.trim();
     if (!spoken) return;
+    this.setPlaybackRate(rate);
     const request = ++this.request;
     this.controller?.abort();
     this.stopAudio();
@@ -70,7 +79,7 @@ class LearningSpeech implements SpeechEngine {
     } catch (error) {
       if (request !== this.request || (error instanceof DOMException && error.name === "AbortError")) return;
       try {
-        await this.browser.speak(spoken, lang);
+        await this.browser.speak(spoken, lang, this.playbackRate);
       } catch {
         throw new Error("播放失败。");
       }

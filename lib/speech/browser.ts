@@ -71,7 +71,7 @@ export function findVoice(lang: SpeechLang) {
 export class BrowserSpeech implements SpeechEngine {
   readonly id = "browser" as const;
 
-  speak(text: string, lang: SpeechLang) {
+  speak(text: string, lang: SpeechLang, rate = 1) {
     if (typeof window === "undefined" || !window.speechSynthesis) {
       return Promise.reject(new Error("这部浏览器没有语音合成。"));
     }
@@ -108,7 +108,7 @@ export class BrowserSpeech implements SpeechEngine {
         if (!voice) allowUnassigned = false;
         const utterance = new SpeechSynthesisUtterance(pieces[pieceIndex] ?? spoken);
         utterance.lang = voice?.lang || lang;
-        utterance.rate = speechRate[lang];
+        utterance.rate = speechRate[lang] * rate;
         if (voice) utterance.voice = voice;
         const started = performance.now();
         utterance.onend = () => {
