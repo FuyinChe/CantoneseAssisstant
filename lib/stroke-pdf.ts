@@ -1,5 +1,6 @@
 import { PDFDocument, StandardFonts, rgb, type PDFFont, type PDFImage, type PDFPage } from "pdf-lib";
 import { SHEET_KAI } from "@/lib/sheet-font";
+import { wordBands } from "@/lib/sheet-layout";
 import { siteName, siteNameEn, siteUrl } from "@/lib/site";
 import { glyphTransform, tianziMarks, tianziSvgMarks, TIANZI_INK } from "@/lib/tianzi";
 
@@ -140,8 +141,6 @@ function strokeSvg(strokes: string[], through: number, box: number) {
     return `<path d="${escapeAttr(path)}" fill="${fill}"/>`;
   }).join("");
   return `<svg xmlns="http://www.w3.org/2000/svg" width="${box}" height="${box}" viewBox="0 0 ${box} ${box}">
-    <rect x="0.5" y="0.5" width="${box - 1}" height="${box - 1}" fill="#ffffff" stroke="#d6d3d1"/>
-    ${tianzi(box)}
     <g transform="${glyphTransform(box)}">${paths}</g>
   </svg>`;
 }
@@ -155,7 +154,7 @@ function practiceSvg(box: number) {
 
 const hanPattern = /\p{Script=Han}/u;
 
-function modelTextCanvas(char: string, box: number, sizeRatio: number) {
+function modelTextCanvas(char: string, box: number, sizeRatio: number, fill = "#1f1a14", weight = 500) {
   const canvas = document.createElement("canvas");
   canvas.width = Math.ceil(box * GLYPH_RATIO);
   canvas.height = Math.ceil(box * GLYPH_RATIO);
@@ -171,8 +170,8 @@ function modelTextCanvas(char: string, box: number, sizeRatio: number) {
   for (const mark of tianziMarks(box)) {
     context.fillRect(mark.x, mark.y, mark.w, mark.h);
   }
-  context.fillStyle = "#1f1a14";
-  context.font = `500 ${box * sizeRatio}px ${SHEET_KAI}`;
+  context.fillStyle = fill;
+  context.font = `${weight} ${box * sizeRatio}px ${SHEET_KAI}`;
   context.textAlign = "center";
   context.textBaseline = "middle";
   context.fillText(char, box / 2, box / 2);
@@ -274,6 +273,21 @@ async function drawText(doc: PDFDocument, cursor: Cursor, lines: TextLine[], gap
   return next;
 }
 
+function drawImageRun(doc: PDFDocument, cursor: Cursor, images: PDFImage[], size: number, gap: number) {
+  const perRow = Math.max(1, Math.floor((contentWidth() + gap) / (size + gap)));
+  for (let start = 0; start < images.length; start += perRow) {
+    const row = images.slice(start, start + perRow);
+    cursor = ensure(doc, cursor, size);
+    let x = SIDE;
+    for (const image of row) {
+      cursor.page.drawImage(image, { x, y: cursor.y - size, width: size, height: size });
+      x += size + gap;
+    }
+    cursor.y -= size + gap;
+  }
+  return cursor;
+}
+
 function drawBoxes(
   cursor: Cursor,
   image: PDFImage | PDFImage[],
@@ -307,40 +321,51 @@ export async function downloadStrokePdf(input: {
   sentence: string;
   truncated: boolean;
   items: SheetItem[];
+  groups: string[][];
   boxSize?: SheetBoxSize;
-  practiceBoxes?: number;
 }) {
   if (input.items.length === 0) throw new Error("还没有选择要打印的字。");
-  const layout = boxLayouts[input.boxSize ?? "small"];
-  const practiceBoxes = input.practiceBoxes ?? 5;
+  const boxSize = input.boxSize ?? "small";
+  const layout = boxLayouts[boxSize];
+  const step = mm(6.5);
+  const stepGap = mm(0.7);
   const doc = await PDFDocument.create();
   doc.setTitle("香港繁体笔顺工作纸");
   const font = await doc.embedFont(StandardFonts.Helvetica);
   const footer = await embedFooter(doc, [
-    "字头用标楷体-港澳。分步笔画按 Make Me a Hanzi 绘出，供临写参考。",
+    "黑色范字用标楷体-港澳。浅灰格供摹写，后面的空格供临写。上方分步笔画按 Make Me a Hanzi 的笔画数据绘出。",
     `${siteName} · ${siteNameEn}`,
     siteUrl,
   ]);
   const practice = await doc.embedPng(pngBytes(await rasterSvg(practiceSvg(layout.box), layout.box)));
-  const glyphs = new Map<string, PDFImage>();
-  const jobs = new Map<string, Promise<HTMLCanvasElement>>();
+  const steps = new Map<string, PDFImage>();
+  const models = new Map<string, PDFImage>();
+  const traces = new Map<string, PDFImage>();
+  const stepJobs = new Map<string, Promise<HTMLCanvasElement>>();
+  const bands = wordBands(input.groups, boxSize);
+  const byChar = new Map(input.items.map((item) => [item.char, item.strokes]));
 
-  function glyphCanvas(item: SheetItem, step: number) {
-    const key = `${item.char}:${step}`;
-    let job = jobs.get(key);
+  function stepCanvas(char: string, strokes: string[], index: number) {
+    const key = `${char}:${index}`;
+    let job = stepJobs.get(key);
     if (!job) {
-      job = rasterSvg(strokeSvg(item.strokes ?? [], step + 1, layout.box), layout.box);
-      jobs.set(key, job);
+      job = rasterSvg(strokeSvg(strokes, index + 1, step), step);
+      stepJobs.set(key, job);
     }
     return job;
   }
 
   await Promise.all(input.items.flatMap((item) => (
-    item.strokes?.map((_, step) => glyphCanvas(item, step)) ?? []
+    item.strokes?.map((_, index) => stepCanvas(item.char, item.strokes ?? [], index)) ?? []
   )));
-  for (const [key, job] of jobs) {
-    glyphs.set(key, await doc.embedPng(pngBytes(await job)));
+  for (const [key, job] of stepJobs) {
+    steps.set(key, await doc.embedPng(pngBytes(await job)));
   }
+  const unique = [...new Set(input.items.map((item) => item.char))];
+  await Promise.all(unique.map(async (char) => {
+    models.set(char, await doc.embedPng(pngBytes(modelTextCanvas(char, layout.box, 0.72))));
+    traces.set(char, await doc.embedPng(pngBytes(modelTextCanvas(char, layout.box, 0.72, "#c4bdb4", 500))));
+  }));
 
   let cursor: Cursor = { page: doc.addPage(A4), y: contentTop() };
   const header: TextLine[] = [
@@ -350,48 +375,63 @@ export async function downloadStrokePdf(input: {
   if (input.truncated) {
     header.push({ text: "句子较长，这张纸只排前 40 个字。", size: 11, weight: 400, color: "#57534e" });
   }
-  cursor = await drawText(doc, cursor, header, 18);
+  cursor = await drawText(doc, cursor, header, 14);
 
-  const perRow = Math.max(1, Math.floor((contentWidth() + layout.gap) / (layout.box + layout.gap)));
-  const pageRoom = contentTop() - contentFloor();
-  for (const item of input.items) {
-    const strokeCount = item.strokes?.length ?? 0;
-    const strokeRows = strokeCount > 0 ? Math.ceil(strokeCount / perRow) : 1;
-    const practiceRows = Math.ceil(practiceBoxes / perRow);
-    const rowHeight = layout.box + 12 + layout.gap;
-    const sectionHeight = Math.ceil(28 * 1.35) + 8
-      + (strokeCount > 0 ? strokeRows * rowHeight : Math.ceil(11 * 1.35) + 8)
-      + practiceRows * (layout.box + layout.gap)
-      + 12;
-    if (sectionHeight <= pageRoom && cursor.y - contentFloor() < sectionHeight) {
-      cursor = { page: doc.addPage(A4), y: contentTop() };
-    }
-    const follow = item.strokes && item.strokes.length > 0 ? layout.box + 16 : 28;
-    cursor = await drawText(doc, cursor, [
-      { text: item.char, size: 28, weight: 500, color: "#1c1917", fontFamily: SHEET_KAI },
-    ], 8, follow);
-    if (item.strokes && item.strokes.length > 0) {
-      for (let start = 0; start < item.strokes.length; start += perRow) {
-        const steps = item.strokes.slice(start, start + perRow);
-        cursor = ensure(doc, cursor, layout.box + 12);
-        const images = steps.map((_, offset) => {
-          const cell = glyphs.get(`${item.char}:${start + offset}`);
-          if (!cell) throw new Error("PDF 暂时没有保存下来。");
-          return cell;
+  const ink = rgb(0.27, 0.25, 0.24);
+  for (const band of bands) {
+    const stepRows = band.chars.reduce((total, char) => {
+      const count = byChar.get(char)?.length ?? 0;
+      const per = Math.max(1, Math.floor((contentWidth() + stepGap) / (step + stepGap)));
+      return total + (count > 0 ? Math.ceil(count / per) : 1);
+    }, 0);
+    const cells = band.models.length + band.traces.length + band.practice;
+    const cellGap = -0.75;
+    const perBox = Math.max(1, Math.floor((contentWidth() + cellGap) / (layout.box + cellGap)));
+    const boxRows = Math.ceil(cells / perBox);
+    const bandHeight = mm(3) + stepRows * (step + stepGap) + boxRows * layout.box + 18;
+    cursor = ensure(doc, cursor, bandHeight);
+    const top = cursor.y;
+    const page = cursor.page;
+    cursor.y -= mm(1.4);
+    for (const char of band.chars) {
+      const strokes = byChar.get(char) ?? null;
+      if (strokes && strokes.length > 0) {
+        const images = strokes.map((_, index) => {
+          const image = steps.get(`${char}:${index}`);
+          if (!image) throw new Error("PDF 暂时没有保存下来。");
+          return image;
         });
-        cursor = drawBoxes(cursor, images, font, steps.map((_, offset) => String(start + offset + 1)), layout);
+        cursor = drawImageRun(doc, cursor, images, step, stepGap);
+      } else {
+        cursor = await drawText(doc, cursor, [
+          { text: `${char}暂时没有笔顺数据，可以照着范字临写。`, size: 11, weight: 400, color: "#57534e" },
+        ], stepGap);
       }
-    } else {
-      cursor = await drawText(doc, cursor, [
-        { text: "这个字暂时没有笔顺数据，可以照着字本身临写。", size: 11, weight: 400, color: "#57534e" },
-      ], 8);
     }
-    for (let start = 0; start < practiceBoxes; start += perRow) {
-      const count = Math.min(practiceBoxes - start, perRow);
-      cursor = ensure(doc, cursor, layout.box);
-      cursor = drawBoxes(cursor, practice, font, Array.from({ length: count }, () => null), layout);
+    const modelImages = [...band.models, ...band.traces].map((char, index) => {
+      const image = (index < band.models.length ? models : traces).get(char);
+      if (!image) throw new Error("PDF 暂时没有保存下来。");
+      return image;
+    });
+    cursor = drawImageRun(doc, cursor, [...modelImages, ...Array.from({ length: band.practice }, () => practice)], layout.box, cellGap);
+    const counts = band.chars.map((char) => {
+      const count = byChar.get(char)?.length;
+      return count ? `${char} ${count}畫` : char;
+    }).join("　");
+    cursor = await drawText(doc, cursor, [
+      { text: counts, size: 11, weight: 400, color: "#57534e" },
+    ], mm(1.6));
+    if (cursor.page === page) {
+      page.drawRectangle({
+        x: SIDE - mm(1),
+        y: cursor.y,
+        width: contentWidth() + mm(2),
+        height: top - cursor.y,
+        borderWidth: 0.8,
+        borderColor: ink,
+      });
     }
-    cursor.y -= 12;
+    cursor.y -= mm(3.5);
   }
 
   stampPages(doc, font, footer);

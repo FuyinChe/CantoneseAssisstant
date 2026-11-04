@@ -93,6 +93,45 @@ select {
   border: 1px solid #d6d3d1;
 }
 
+.word-band {
+  display: flex;
+  flex-direction: column;
+  gap: 1.4mm;
+  border: 1px solid #44403c;
+  padding: 1.6mm 1.8mm 1.2mm;
+  break-inside: avoid;
+}
+
+.stroke-strip {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.7mm;
+}
+
+.stroke-step {
+  display: block;
+  width: 6.5mm;
+  height: 6.5mm;
+  background: #fff;
+}
+
+.word-line {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0;
+}
+
+.word-line > svg {
+  margin-right: -1px;
+  margin-bottom: -1px;
+}
+
+.word-count {
+  font-size: 11px;
+  line-height: 1.4;
+  color: #57534e;
+}
+
 .practice-frame {
   fill: #fff;
   stroke: #44403c;
@@ -195,7 +234,8 @@ select {
     fill: #c8bfb4;
   }
 
-  .copy-pair {
+  .copy-pair,
+  .word-band {
     break-inside: avoid;
   }
 }

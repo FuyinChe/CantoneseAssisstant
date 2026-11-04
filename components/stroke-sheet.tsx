@@ -4,6 +4,7 @@ import { useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import type { SheetBoxSize } from "@/lib/stroke-pdf";
 import { SHEET_KAI } from "@/lib/sheet-font";
+import { pickedGroups, sheetGroups, wordBands } from "@/lib/sheet-layout";
 import { siteName, siteNameEn, siteUrl } from "@/lib/site";
 import { loadStrokes } from "@/lib/strokes";
 import { TIANZI_VIEW, glyphTransform, tianziMarks } from "@/lib/tianzi";
@@ -11,7 +12,6 @@ import { useLocale } from "@/lib/locale";
 
 const hanPattern = /\p{Script=Han}/u;
 const punctPattern = /\p{P}/u;
-const PRACTICE_BOXES = 5;
 const SHEET_LIMIT = 40;
 const COPY_LIMIT = 120;
 
@@ -34,11 +34,21 @@ function TianziMarks() {
   );
 }
 
-function StrokeGlyph({ strokes, through }: { strokes: string[]; through: number }) {
+function StrokeGlyph({
+  strokes,
+  through,
+  className = "stroke-box",
+  marks = true,
+}: {
+  strokes: string[];
+  through: number;
+  className?: string;
+  marks?: boolean;
+}) {
   const transform = glyphTransform(TIANZI_VIEW);
   return (
-    <svg viewBox={`0 0 ${TIANZI_VIEW} ${TIANZI_VIEW}`} className="stroke-box" aria-hidden="true">
-      <TianziMarks />
+    <svg viewBox={`0 0 ${TIANZI_VIEW} ${TIANZI_VIEW}`} className={className} aria-hidden="true">
+      {marks ? <TianziMarks /> : null}
       <g transform={transform}>
         {strokes.slice(0, through).map((path, index) => (
           <path key={index} d={path} fill={index < through - 1 ? "#1f1a14" : "#9c3b2e"} />
@@ -48,7 +58,7 @@ function StrokeGlyph({ strokes, through }: { strokes: string[]; through: number 
   );
 }
 
-function ModelGlyph({ char }: { char: string }) {
+function ModelGlyph({ char, ink = "#1f1a14", weight = 500 }: { char: string; ink?: string; weight?: number }) {
   if (!hanPattern.test(char) && !punctPattern.test(char)) return <PracticeBox />;
   return (
     <svg viewBox={`0 0 ${TIANZI_VIEW} ${TIANZI_VIEW}`} className="model-box" aria-hidden="true">
@@ -60,8 +70,9 @@ function ModelGlyph({ char }: { char: string }) {
         textAnchor="middle"
         dominantBaseline="central"
         fontFamily={SHEET_KAI}
+        fontWeight={weight}
         fontSize={hanPattern.test(char) ? TIANZI_VIEW * 0.72 : TIANZI_VIEW * 0.48}
-        fill="#1f1a14"
+        fill={ink}
       >
         {char}
       </text>
@@ -92,13 +103,15 @@ export function StrokeSheet({ text }: { text: string }) {
   const requestId = useRef(0);
   const hanChars = Array.from(text).filter((char) => hanPattern.test(char));
   const copyChars = Array.from(text).filter((char) => hanPattern.test(char) || punctPattern.test(char));
+  const strokeGroups = sheetGroups(text, SHEET_LIMIT);
   const characters = mode === "copy" ? copyChars : hanChars;
   const limit = mode === "copy" ? COPY_LIMIT : SHEET_LIMIT;
-  const shown = characters.slice(0, limit);
+  const shown = mode === "copy" ? copyChars.slice(0, COPY_LIMIT) : strokeGroups.flat();
   const truncated = characters.length > limit;
   const picks = selected.length === shown.length ? selected : shown.map(() => true);
   const selectedCount = picks.filter(Boolean).length;
   const copied = shown.flatMap((char, index) => (picks[index] ? [char] : []));
+  const printedGroups = mode === "strokes" ? pickedGroups(strokeGroups, picks) : [];
 
   function setAll(on: boolean) {
     setSelected(shown.map(() => on));
@@ -169,10 +182,8 @@ export function StrokeSheet({ text }: { text: string }) {
           items: copied.map((char) => ({ char, strokes: strokes[char] ?? null })),
         });
       } else {
-        const items = shown.flatMap((char, index) => (
-          picks[index] ? [{ char, strokes: strokes[char] ?? null }] : []
-        ));
-        await pdf.downloadStrokePdf({ sentence: text, truncated, items, boxSize, practiceBoxes: PRACTICE_BOXES });
+        const items = printedGroups.flat().map((char) => ({ char, strokes: strokes[char] ?? null }));
+        await pdf.downloadStrokePdf({ sentence: text, truncated, items, groups: printedGroups, boxSize });
       }
     } catch (reason) {
       setPdfError(reason instanceof Error ? reason.message : "PDF 暂时没有保存下来。");
@@ -197,7 +208,7 @@ export function StrokeSheet({ text }: { text: string }) {
   const title = mode === "copy" ? t.sheetTitleCopy : "香港繁体笔顺工作纸";
   const previewHint = mode === "copy"
     ? t.sheetCopyHint
-    : "预览工作纸。红色是该步新写的一笔。只输出勾选的字，方格大小会一起用于打印和 PDF。";
+    : "有逗号时按逗号分组，没有逗号时两个字一组。前面是范字，接着同样的字用浅灰色摹写，后面至少六个空格。上方是分步笔画，红色是该步新写的一笔。";
 
   return (
     <>
@@ -336,38 +347,54 @@ export function StrokeSheet({ text }: { text: string }) {
                 ))}
               </div>
             ) : (
-              shown.map((char, index) => {
-                if (!picks[index]) return null;
-                const paths = strokes[char];
-                return (
-                  <section key={`${char}-${index}`} className="flex flex-col gap-3 break-inside-avoid">
-                    <h3 className="text-3xl font-medium" style={{ fontFamily: SHEET_KAI }}>{char}</h3>
-                    {paths && paths.length > 0 ? (
-                      <ol className="flex flex-wrap gap-[var(--box-gap)]">
+              <div className="flex flex-col gap-3">
+                {wordBands(printedGroups, boxSize).map((band, bandIndex) => (
+                <section key={`${band.chars.join("-")}-${bandIndex}`} className="word-band">
+                  {band.chars.map((char, charIndex) => {
+                    const paths = strokes[char];
+                    if (!paths || paths.length === 0) {
+                      return loading ? null : (
+                        <p key={`${char}-${charIndex}-missing`} className="text-sm text-neutral-600">
+                          {char}暂时没有笔顺数据，可以照着范字临写。
+                        </p>
+                      );
+                    }
+                    return (
+                      <ol key={`${char}-${charIndex}-steps`} className="stroke-strip" aria-label={`${char} 的分步笔画`}>
                         {paths.map((_, step) => (
-                          <li key={step} className="flex flex-col items-center gap-1">
-                            <StrokeGlyph strokes={paths} through={step + 1} />
-                            <span className="text-xs text-neutral-600">{step + 1}</span>
+                          <li key={step}>
+                            <StrokeGlyph strokes={paths} through={step + 1} className="stroke-step" marks={false} />
                           </li>
                         ))}
                       </ol>
-                    ) : loading ? null : (
-                      <p className="text-sm text-neutral-600">这个字暂时没有笔顺数据，可以照着字本身临写。</p>
-                    )}
-                    <div className="flex flex-wrap gap-[var(--box-gap)]" aria-label={`${char} 的临写格`}>
-                      {Array.from({ length: PRACTICE_BOXES }, (_, box) => (
-                        <PracticeBox key={box} />
-                      ))}
-                    </div>
-                  </section>
-                );
-              })
+                    );
+                  })}
+                  <div className="word-line">
+                    {band.models.map((char, index) => (
+                      <ModelGlyph key={`${char}-model-${index}`} char={char} />
+                    ))}
+                    {band.traces.map((char, index) => (
+                      <ModelGlyph key={`${char}-trace-${index}`} char={char} ink="#c4bdb4" weight={500} />
+                    ))}
+                    {Array.from({ length: band.practice }, (_, index) => (
+                      <PracticeBox key={`practice-${index}`} />
+                    ))}
+                  </div>
+                  <p className="word-count">
+                    {band.chars.map((char) => {
+                      const count = strokes[char]?.length;
+                      return count ? `${char} ${count}畫` : char;
+                    }).join("　")}
+                  </p>
+                </section>
+                ))}
+              </div>
             )}
             <footer className="sheet-print-footer border-t border-neutral-200 pt-4 text-xs text-neutral-500">
               {mode === "copy" ? (
                 <p>上一行范字用标楷体-港澳，下一行田字格供抄写。田字格虚线会印在纸上。</p>
               ) : (
-                <p>字头用标楷体-港澳。分步笔画按 Make Me a Hanzi 绘出，供临写参考。</p>
+                <p>黑色范字用标楷体-港澳。浅灰格供摹写，后面的空格供临写。上方分步笔画按 Make Me a Hanzi 的笔画数据绘出。</p>
               )}
               <p className="mt-2">{siteName} · {siteNameEn}</p>
               <p>
