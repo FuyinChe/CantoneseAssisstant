@@ -4,7 +4,7 @@ import { useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import type { SheetBoxSize } from "@/lib/stroke-pdf";
 import { SHEET_KAI } from "@/lib/sheet-font";
-import { pickedGroups, sheetGroups, wordBands } from "@/lib/sheet-layout";
+import { copyChars, copyColumns, copyLines, pickedCopyLines, pickedGroups, sheetGroups, withCopyGrid, wordBands } from "@/lib/sheet-layout";
 import { siteName, siteNameEn, siteUrl } from "@/lib/site";
 import { loadStrokes } from "@/lib/strokes";
 import { TIANZI_VIEW, glyphTransform, tianziMarks } from "@/lib/tianzi";
@@ -102,16 +102,18 @@ export function StrokeSheet({ text }: { text: string }) {
   const [boxSize, setBoxSize] = useState<SheetBoxSize>("small");
   const requestId = useRef(0);
   const hanChars = Array.from(text).filter((char) => hanPattern.test(char));
-  const copyChars = Array.from(text).filter((char) => hanPattern.test(char) || punctPattern.test(char));
   const strokeGroups = sheetGroups(text, SHEET_LIMIT);
-  const characters = mode === "copy" ? copyChars : hanChars;
+  const copyLineList = copyLines(text, COPY_LIMIT);
+  const copyCharList = copyChars(copyLineList);
   const limit = mode === "copy" ? COPY_LIMIT : SHEET_LIMIT;
-  const shown = mode === "copy" ? copyChars.slice(0, COPY_LIMIT) : strokeGroups.flat();
-  const truncated = characters.length > limit;
+  const shown = mode === "copy" ? copyCharList : strokeGroups.flat();
+  const truncated = mode === "copy"
+    ? copyChars(copyLines(text, COPY_LIMIT + 1)).length > COPY_LIMIT
+    : hanChars.length > SHEET_LIMIT;
   const picks = selected.length === shown.length ? selected : shown.map(() => true);
   const selectedCount = picks.filter(Boolean).length;
-  const copied = shown.flatMap((char, index) => (picks[index] ? [char] : []));
   const printedGroups = mode === "strokes" ? pickedGroups(strokeGroups, picks) : [];
+  const printedCopyLines = mode === "copy" ? withCopyGrid(pickedCopyLines(copyLineList, picks), copyColumns(boxSize)) : [];
 
   function setAll(on: boolean) {
     setSelected(shown.map(() => on));
@@ -158,7 +160,7 @@ export function StrokeSheet({ text }: { text: string }) {
     setMode(next);
     setPdfError("");
     if (!open) return;
-    const source = next === "copy" ? copyChars : hanChars;
+    const source = next === "copy" ? copyCharList : hanChars;
     const chars = source.slice(0, next === "copy" ? COPY_LIMIT : SHEET_LIMIT);
     void loadStrokeData(chars);
   }
@@ -179,7 +181,7 @@ export function StrokeSheet({ text }: { text: string }) {
           sentence: text,
           truncated,
           boxSize,
-          items: copied.map((char) => ({ char, strokes: strokes[char] ?? null })),
+          lines: printedCopyLines,
         });
       } else {
         const items = printedGroups.flat().map((char) => ({ char, strokes: strokes[char] ?? null }));
@@ -331,18 +333,27 @@ export function StrokeSheet({ text }: { text: string }) {
           <article className="mx-auto flex w-full max-w-[186mm] flex-col gap-8 bg-white px-6 py-8 text-neutral-900">
             <header>
               <h2 className="text-2xl font-semibold">{title}</h2>
-              <p className="mt-2 text-xl leading-relaxed" style={{ fontFamily: SHEET_KAI }}>{text}</p>
+              <p className="mt-2 whitespace-pre-wrap text-xl leading-relaxed" style={{ fontFamily: SHEET_KAI }}>{text}</p>
               {truncated ? <p className="mt-2 text-sm text-neutral-600">句子较长，这张纸只排前 {limit} 个字。</p> : null}
             </header>
             {loading ? <p>正在准备笔顺…</p> : null}
             {error ? <p>{error}</p> : null}
             {selectedCount === 0 ? <p className="no-print text-sm text-neutral-600">还没有选择要打印的字。</p> : null}
             {mode === "copy" ? (
-              <div className="copy-grid">
-                {copied.map((char, index) => (
-                  <div key={`${char}-${index}`} className="copy-pair">
-                    <ModelGlyph char={char} />
-                    <PracticeBox />
+              <div className="copy-lines">
+                {printedCopyLines.map((line, lineIndex) => (
+                  <div key={lineIndex} className="copy-line">
+                    {line.map((cell, index) => cell.kind === "space" ? (
+                      <div key={index} className="copy-pair" aria-hidden="true">
+                        <PracticeBox />
+                        <PracticeBox />
+                      </div>
+                    ) : (
+                      <div key={`${cell.char}-${index}`} className="copy-pair">
+                        <ModelGlyph char={cell.char} />
+                        <PracticeBox />
+                      </div>
+                    ))}
                   </div>
                 ))}
               </div>
@@ -392,7 +403,7 @@ export function StrokeSheet({ text }: { text: string }) {
             )}
             <footer className="sheet-print-footer border-t border-neutral-200 pt-4 text-xs text-neutral-500">
               {mode === "copy" ? (
-                <p>上一行范字用标楷体-港澳，下一行田字格供抄写。田字格虚线会印在纸上。</p>
+                <p>按原文分行。空格和空行也留田字格，一行没排满会补到行尾。上一行是范字，下一行供抄写。</p>
               ) : (
                 <p>黑色范字用标楷体-港澳。浅灰格供摹写，后面的空格供临写。上方分步笔画按 Make Me a Hanzi 的笔画数据绘出。</p>
               )}

@@ -9,6 +9,70 @@ export type WordBand = {
 
 const MIN_PRACTICE = 6;
 const hanPattern = /\p{Script=Han}/u;
+const punctPattern = /\p{P}/u;
+
+export type CopyCell =
+  | { kind: "char"; char: string }
+  | { kind: "space" };
+
+export function copyLines(text: string, limit: number): CopyCell[][] {
+  const lines: CopyCell[][] = [];
+  let count = 0;
+  const normalized = text.replace(/\r\n?/g, "\n");
+  for (const raw of normalized.split("\n")) {
+    const line: CopyCell[] = [];
+    let reached = false;
+    for (const char of Array.from(raw)) {
+      if (hanPattern.test(char) || punctPattern.test(char)) {
+        if (count >= limit) {
+          reached = true;
+          break;
+        }
+        line.push({ kind: "char", char });
+        count += 1;
+      } else if (/[ \t\u3000\u00a0]/.test(char)) {
+        line.push({ kind: "space" });
+      }
+    }
+    lines.push(line);
+    if (reached || count >= limit) break;
+  }
+  return lines;
+}
+
+export function copyColumns(boxSize: SheetBoxSize) {
+  return boxSize === "large" ? 6 : 10;
+}
+
+export function withCopyGrid(lines: CopyCell[][], columns: number): CopyCell[][] {
+  const blank = (): CopyCell => ({ kind: "space" });
+  return lines.map((line) => {
+    if (line.length >= columns) return line;
+    return [...line, ...Array.from({ length: columns - line.length }, blank)];
+  });
+}
+
+export function copyChars(lines: CopyCell[][]) {
+  return lines.flatMap((line) => line.flatMap((cell) => (cell.kind === "char" ? [cell.char] : [])));
+}
+
+export function pickedCopyLines(lines: CopyCell[][], picks: boolean[]) {
+  let index = 0;
+  const picked: CopyCell[][] = [];
+  for (const line of lines) {
+    const kept: CopyCell[] = [];
+    for (const cell of line) {
+      if (cell.kind === "space") {
+        kept.push(cell);
+        continue;
+      }
+      if (picks[index]) kept.push(cell);
+      index += 1;
+    }
+    picked.push(kept);
+  }
+  return picked;
+}
 
 export function sheetGroups(text: string, limit: number) {
   const groups: string[][] = [];

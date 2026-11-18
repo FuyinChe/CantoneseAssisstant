@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { PlayButton } from "@/components/play-button";
+import { ResultBox } from "@/components/result-box";
 import { useLocale } from "@/lib/locale";
 
 type Translation = {
@@ -55,7 +56,9 @@ export function EnglishCard({ source }: { source: string }) {
     <section className="border-t border-line py-8">
       <h2 className="mb-3 font-serif text-[1.35rem] font-medium">{t.english}</h2>
       <p className="mb-5 text-muted">{t.englishHint}</p>
-      <p className="min-h-16 whitespace-pre-wrap text-lg">{text || (pending ? t.translating : "…")}</p>
+      <ResultBox text={text}>
+        <p className="whitespace-pre-wrap text-lg">{text || (pending ? t.translating : "…")}</p>
+      </ResultBox>
       {error ? <p className="text-sm text-accent">{error}</p> : null}
       <div className="mt-4">
         <PlayButton text={text} lang="en-US" label={t.playEnglish} />

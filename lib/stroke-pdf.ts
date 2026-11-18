@@ -1,6 +1,6 @@
 import { PDFDocument, StandardFonts, rgb, type PDFFont, type PDFImage, type PDFPage } from "pdf-lib";
 import { SHEET_KAI } from "@/lib/sheet-font";
-import { wordBands } from "@/lib/sheet-layout";
+import { copyColumns, withCopyGrid, wordBands, type CopyCell } from "@/lib/sheet-layout";
 import { siteName, siteNameEn, siteUrl } from "@/lib/site";
 import { TIANZI_VIEW, tianziMarks } from "@/lib/tianzi";
 
@@ -268,7 +268,12 @@ function paintLines(lines: TextLine[], maxWidth: number) {
     measure.font = fontOf(line);
     const height = Math.ceil(line.size * 1.35);
     let current = "";
-    for (const char of Array.from(line.text)) {
+    for (const char of Array.from(line.text.replace(/\r\n?/g, "\n"))) {
+      if (char === "\n") {
+        wrapped.push({ text: current, line, height });
+        current = "";
+        continue;
+      }
       const next = current + char;
       if (current && measure.measureText(next).width > maxWidth) {
         wrapped.push({ text: current, line, height });
@@ -347,37 +352,6 @@ function drawStrokeRun(doc: PDFDocument, cursor: Cursor, strokes: string[], size
     }
     cursor.y -= size + gap;
   }
-  return cursor;
-}
-
-function drawBoxes(
-  cursor: Cursor,
-  image: PDFImage | PDFImage[] | null,
-  font: PDFFont,
-  labels: Array<string | null>,
-  layout: BoxLayout,
-) {
-  const hasLabel = labels.some((label) => label);
-  const rowHeight = layout.box + (hasLabel ? 12 : 0);
-  let x = SIDE;
-  labels.forEach((label, index) => {
-    const cell = image == null ? null : Array.isArray(image) ? image[index] : image;
-    const y = cursor.y - layout.box;
-    drawCell(cursor.page, x, y, layout.box);
-    if (cell) cursor.page.drawImage(cell, { x, y, width: layout.box, height: layout.box });
-    if (label) {
-      const width = font.widthOfTextAtSize(label, 8);
-      cursor.page.drawText(label, {
-        x: x + (layout.box - width) / 2,
-        y: cursor.y - layout.box - 10,
-        size: 8,
-        font,
-        color: rgb(0.44, 0.4, 0.36),
-      });
-    }
-    x += layout.box + layout.gap;
-  });
-  cursor.y -= rowHeight + layout.gap;
   return cursor;
 }
 
@@ -480,21 +454,22 @@ export async function downloadStrokePdf(input: {
 export async function downloadCopyPdf(input: {
   sentence: string;
   truncated: boolean;
-  items: SheetItem[];
+  lines: CopyCell[][];
   boxSize?: SheetBoxSize;
 }) {
-  if (input.items.length === 0) throw new Error("还没有选择要打印的字。");
+  const chars = input.lines.flatMap((line) => line.flatMap((cell) => (cell.kind === "char" ? [cell.char] : [])));
+  if (chars.length === 0) throw new Error("还没有选择要打印的字。");
   const layout = boxLayouts[input.boxSize ?? "small"];
   const doc = await PDFDocument.create();
   doc.setTitle("香港繁体抄写工作纸");
   const font = await doc.embedFont(StandardFonts.Helvetica);
   const footer = await embedFooter(doc, [
-    "上一行范字用标楷体-港澳，下一行田字格供抄写。",
+    "按原文分行。空格和空行也留田字格。上一行是范字，下一行供抄写。",
     `${siteName} · ${siteNameEn}`,
     siteUrl,
   ]);
   const models = new Map<string, PDFImage>();
-  const unique = [...new Set(input.items.map((item) => item.char))];
+  const unique = [...new Set(chars)];
   await Promise.all(unique.map(async (char) => {
     models.set(
       char,
@@ -512,20 +487,33 @@ export async function downloadCopyPdf(input: {
   }
   cursor = await drawText(doc, cursor, header, 16);
 
-  const perRow = Math.max(1, Math.floor((contentWidth() + layout.gap) / (layout.box + layout.gap)));
   const pairGap = layout.gap * 2;
-  for (let start = 0; start < input.items.length; start += perRow) {
-    const row = input.items.slice(start, start + perRow);
+  const step = layout.box + layout.gap;
+  const lines = withCopyGrid(input.lines, copyColumns(input.boxSize ?? "small"));
+  for (const line of lines) {
     const pairHeight = layout.box * 2 + layout.gap * 2 + pairGap;
     cursor = ensure(doc, cursor, pairHeight);
-    const images = row.map((item) => {
-      const image = models.get(item.char);
+    let x = SIDE;
+    for (const cell of line) {
+      if (cell.kind === "space") {
+        drawCell(cursor.page, x, cursor.y - layout.box, layout.box);
+        x += step;
+        continue;
+      }
+      const image = models.get(cell.char);
       if (!image) throw new Error("PDF 暂时没有保存下来。");
-      return image;
-    });
-    cursor = drawBoxes(cursor, images, font, row.map(() => null), layout);
-    cursor = drawBoxes(cursor, null, font, row.map(() => null), layout);
-    cursor.y -= pairGap;
+      const y = cursor.y - layout.box;
+      drawCell(cursor.page, x, y, layout.box);
+      cursor.page.drawImage(image, { x, y, width: layout.box, height: layout.box });
+      x += step;
+    }
+    cursor.y -= layout.box + layout.gap;
+    x = SIDE;
+    for (const cell of line) {
+      drawCell(cursor.page, x, cursor.y - layout.box, layout.box);
+      x += step;
+    }
+    cursor.y -= layout.box + layout.gap + pairGap;
   }
 
   stampPages(doc, font, footer);
