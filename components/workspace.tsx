@@ -7,6 +7,7 @@ import { PinyinLine } from "@/components/pinyin-line";
 import { ZhuyinLine } from "@/components/zhuyin-line";
 import { OcrPanel } from "@/components/ocr-panel";
 import { PlayButton } from "@/components/play-button";
+import { ResultBox } from "@/components/result-box";
 import { StrokeSheet } from "@/components/stroke-sheet";
 import { convertText, rewriteCantonese } from "@/lib/convert";
 import { glyphMarks } from "@/lib/glyphs";
@@ -41,41 +42,47 @@ function GlyphComparison({
             <StrokeSheet text={result.traditional} />
           </div>
           <p className="text-muted">{t.hongKongHint}</p>
-          <VariantLine
-            key={`${result.simplified}|${result.taiwan}`}
-            text={result.traditional}
-            simplified={result.simplified}
-            marks={hongKongMarks}
-            lang="zh-HK"
-            speakLabel={t.playWritten}
-            chooseLabel={t.variantPick}
-            onChange={onTraditional}
-          />
+          <ResultBox text={result.traditional}>
+            <VariantLine
+              key={`${result.simplified}|${result.taiwan}`}
+              text={result.traditional}
+              simplified={result.simplified}
+              marks={hongKongMarks}
+              lang="zh-HK"
+              speakLabel={t.playWritten}
+              chooseLabel={t.variantPick}
+              onChange={onTraditional}
+            />
+          </ResultBox>
           <PlayButton text={result.traditional} lang="zh-HK" label={t.playWritten} caption={t.playWritten} />
         </div>
         <div className="flex flex-col gap-3 border-t border-line pt-8">
           <h3 className="text-lg font-medium">{t.taiwan}</h3>
           <p className="text-muted">{t.taiwanHint}</p>
-          {result.taiwan ? (
-            <ZhuyinLine
-              key={result.taiwan}
-              text={result.taiwan}
-              simplified={result.simplified}
-              marks={taiwanMarks}
-            />
-          ) : (
-            <p className="min-h-16 text-lg">…</p>
-          )}
+          <ResultBox text={result.taiwan}>
+            {result.taiwan ? (
+              <ZhuyinLine
+                key={result.taiwan}
+                text={result.taiwan}
+                simplified={result.simplified}
+                marks={taiwanMarks}
+              />
+            ) : (
+              <p className="text-lg">…</p>
+            )}
+          </ResultBox>
           <PlayButton text={result.taiwan} lang="zh-TW" label={t.playTaiwan} />
         </div>
         <div className="flex flex-col gap-3 border-t border-line pt-8">
           <h3 className="text-lg font-medium">{t.simplified}</h3>
           <p className="text-muted">{t.simplifiedHint}</p>
-          {result.simplified ? (
-            <PinyinLine key={result.simplified} text={result.simplified} marks={simplifiedMarks} />
-          ) : (
-            <p className="min-h-16 text-lg">…</p>
-          )}
+          <ResultBox text={result.simplified}>
+            {result.simplified ? (
+              <PinyinLine key={result.simplified} text={result.simplified} marks={simplifiedMarks} />
+            ) : (
+              <p className="text-lg">…</p>
+            )}
+          </ResultBox>
           <PlayButton text={result.simplified} lang="zh-CN" label={t.playMandarin} />
         </div>
       </div>
@@ -119,7 +126,9 @@ export function Workspace() {
       <section className="border-t border-line py-8">
         <h2 className="mb-3 font-serif text-[1.35rem] font-medium">{t.cantonese}</h2>
         <p className="mb-5 text-muted">{t.cantoneseHint}</p>
-        <JyutpingLine key={result.cantonese} text={result.cantonese} />
+        <ResultBox text={result.cantonese}>
+          <JyutpingLine key={result.cantonese} text={result.cantonese} />
+        </ResultBox>
         <div className="mt-4">
           <PlayButton text={result.cantonese} lang="zh-HK" label={t.playCantonese} />
         </div>

@@ -8,6 +8,8 @@
   --accent: #9c3b2e;
   --accent-soft: #f6e6df;
   --muted: #6e655c;
+  --result: #ebe2d0;
+  --result-line: #ddd0ba;
   color-scheme: light;
 }
 
@@ -19,6 +21,8 @@
   --color-accent: var(--accent);
   --color-accent-soft: var(--accent-soft);
   --color-muted: var(--muted);
+  --color-result: var(--result);
+  --color-result-line: var(--result-line);
   --font-sans: var(--font-source-sans), "PingFang HK", "Hiragino Sans CNS", "Noto Sans CJK HK", sans-serif;
   --font-serif: var(--font-fraunces), Georgia, "Songti SC", "Noto Serif CJK SC", serif;
 }
@@ -141,11 +145,18 @@ select {
   fill: #d2c8bb;
 }
 
-.copy-grid {
+.copy-lines {
   display: flex;
-  flex-wrap: wrap;
+  flex-direction: column;
+  gap: 6mm;
+}
+
+.copy-line {
+  display: flex;
+  flex-wrap: nowrap;
+  align-items: flex-start;
   column-gap: var(--box-gap);
-  row-gap: 6mm;
+  min-height: calc(var(--box) * 2 + 2.5mm);
 }
 
 .copy-pair {
@@ -234,7 +245,7 @@ select {
     fill: #c8bfb4;
   }
 
-  .copy-pair,
+  .copy-line,
   .word-band {
     break-inside: avoid;
   }
