@@ -403,7 +403,7 @@ export function StrokeSheet({ text }: { text: string }) {
             )}
             <footer className="sheet-print-footer border-t border-neutral-200 pt-4 text-xs text-neutral-500">
               {mode === "copy" ? (
-                <p>按原文分行。空格和空行也留田字格，一行没排满会补到行尾。上一行是范字，下一行供抄写。</p>
+                <p>每行格子数量固定。一行放不下会自动换行，输入里的换行也会另起一行。空格和空行也留田字格。上一行是范字，下一行供抄写。</p>
               ) : (
                 <p>黑色范字用标楷体-港澳。浅灰格供摹写，后面的空格供临写。上方分步笔画按 Make Me a Hanzi 的笔画数据绘出。</p>
               )}

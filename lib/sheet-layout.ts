@@ -45,11 +45,21 @@ export function copyColumns(boxSize: SheetBoxSize) {
 }
 
 export function withCopyGrid(lines: CopyCell[][], columns: number): CopyCell[][] {
+  const width = Math.max(1, columns);
   const blank = (): CopyCell => ({ kind: "space" });
-  return lines.map((line) => {
-    if (line.length >= columns) return line;
-    return [...line, ...Array.from({ length: columns - line.length }, blank)];
-  });
+  const pad = (row: CopyCell[]) =>
+    row.length >= width ? row : [...row, ...Array.from({ length: width - row.length }, blank)];
+  const rows: CopyCell[][] = [];
+  for (const line of lines) {
+    if (line.length === 0) {
+      rows.push(pad([]));
+      continue;
+    }
+    for (let start = 0; start < line.length; start += width) {
+      rows.push(pad(line.slice(start, start + width)));
+    }
+  }
+  return rows;
 }
 
 export function copyChars(lines: CopyCell[][]) {
