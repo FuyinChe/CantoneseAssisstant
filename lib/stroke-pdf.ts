@@ -464,7 +464,7 @@ export async function downloadCopyPdf(input: {
   doc.setTitle("香港繁体抄写工作纸");
   const font = await doc.embedFont(StandardFonts.Helvetica);
   const footer = await embedFooter(doc, [
-    "按原文分行。空格和空行也留田字格。上一行是范字，下一行供抄写。",
+    "每行格子数量固定。一行放不下会自动换行，输入里的换行也会另起一行。上一行是范字，下一行供抄写。",
     `${siteName} · ${siteNameEn}`,
     siteUrl,
   ]);
